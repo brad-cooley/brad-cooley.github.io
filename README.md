@@ -1,2 +1,2 @@
-# bwcooley.github.com
- Personal Website
+# brad-cooley.github.io
+Currently: doesthesprintend.today
