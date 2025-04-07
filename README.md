@@ -1,2 +1,3 @@
 # brad-cooley.github.io
-Currently: doesthesprintend.today
+
+Currently: brad.cooley.dev
