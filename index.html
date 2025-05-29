@@ -1,30 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brad Cooley | Coming Soon</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <div class="container">
-        <div class="content">
-            <h1 data-text="Brad Cooley">Brad Cooley</h1>
-            <p>Blogs, projects, and much more. Coming soon.<p>
-            <div class="social-links">
-                <a href="https://github.com/brad-cooley" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-github"></i>
-                </a>
-                <a href="https://linkedin.com/in/bradcooley" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-linkedin"></i>
-                </a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brad Cooley | Software & Data Engineer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/desktop.css" />
+    <link rel="stylesheet" href="css/mobile-portrait.css" />
+    <link rel="stylesheet" href="css/mobile-landscape.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="desktop-layout">
+        <div class="sections-container">
+          <!-- Home Section -->
+          <section class="section home-section active">
+            <div class="glass-container home-glass">
+              <div class="home-content">
+                <div class="name-display">
+                  <h1>Brad Cooley</h1>
+                </div>
+                <p class="tagline">Software & Data Engineer</p>
+                <div class="social-section">
+                  <div class="social-links" data-social-links>
+                    <a
+                      href="https://github.com/brad-cooley"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="social-link"
+                      aria-label="GitHub Profile"
+                    >
+                      <i class="fab fa-github"></i>
+                    </a>
+                    <a
+                      href="https://linkedin.com/in/bradcooley"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="social-link"
+                      aria-label="LinkedIn Profile"
+                    >
+                      <i class="fab fa-linkedin"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
+          </section>
+
+          <!-- Section Template for About/Projects/Blog/Resume -->
+          <section class="section" data-section="about">
+            <div class="glass-container section-glass">
+              <div class="section-content">
+                <div class="section-icon">
+                  <i class="fas fa-user"></i>
+                </div>
+                <h2 class="section-title">About</h2>
+                <p class="section-description">
+                  Passionate developer creating elegant solutions to complex
+                  problems. Focused on building applications that provide
+                  exceptional user experiences.
+                </p>
+                <div class="coming-soon-badge">
+                  <i class="fas fa-clock"></i>
+                  <span>More details coming soon</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" data-section="projects">
+            <div class="glass-container section-glass">
+              <div class="section-content">
+                <div class="section-icon">
+                  <i class="fas fa-code"></i>
+                </div>
+                <h2 class="section-title">Projects</h2>
+                <p class="section-description">
+                  Explore my latest work, from web applications to open-source
+                  contributions. Each project represents a journey of learning,
+                  problem-solving, and innovation.
+                </p>
+                <div class="coming-soon-badge">
+                  <i class="fas fa-rocket"></i>
+                  <span>Showcase launching soon</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" data-section="blog">
+            <div class="glass-container section-glass">
+              <div class="section-content">
+                <div class="section-icon">
+                  <i class="fas fa-pen-fancy"></i>
+                </div>
+                <h2 class="section-title">Blog</h2>
+                <p class="section-description">
+                  Dive into my thoughts on technology, development practices,
+                  and industry trends. Knowledge sharing and documentation of my
+                  learning journey.
+                </p>
+                <div class="coming-soon-badge">
+                  <i class="fas fa-edit"></i>
+                  <span>First posts coming soon</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" data-section="resume">
+            <div class="glass-container section-glass">
+              <div class="section-content">
+                <div class="section-icon">
+                  <i class="fas fa-user-tie"></i>
+                </div>
+                <h2 class="section-title">Resume</h2>
+                <p class="section-description">
+                  Professional background, skills, and experience. A
+                  comprehensive look at my career journey and technical
+                  expertise.
+                </p>
+                <div class="coming-soon-badge">
+                  <i class="fas fa-file-alt"></i>
+                  <span>Full resume coming soon</span>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
+
+        <!-- Navigation -->
+        <nav class="bottom-nav">
+          <div class="nav-container" data-nav-container>
+            <div
+              class="nav-item"
+              data-section="0"
+              role="button"
+              tabindex="0"
+              aria-label="Home"
+            >
+              <i class="nav-icon fas fa-home"></i>
+              <span class="nav-label">Home</span>
+            </div>
+            <div
+              class="nav-item"
+              data-section="1"
+              role="button"
+              tabindex="0"
+              aria-label="About"
+            >
+              <i class="nav-icon fas fa-user"></i>
+              <span class="nav-label">About</span>
+            </div>
+            <div
+              class="nav-item active"
+              data-section="2"
+              role="button"
+              tabindex="0"
+              aria-label="Projects"
+            >
+              <i class="nav-icon fas fa-code"></i>
+              <span class="nav-label">Projects</span>
+            </div>
+            <div
+              class="nav-item"
+              data-section="3"
+              role="button"
+              tabindex="0"
+              aria-label="Blog"
+            >
+              <i class="nav-icon fas fa-pen-fancy"></i>
+              <span class="nav-label">Blog</span>
+            </div>
+            <div
+              class="nav-item"
+              data-section="4"
+              role="button"
+              tabindex="0"
+              aria-label="Resume"
+            >
+              <i class="nav-icon fas fa-user-tie"></i>
+              <span class="nav-label">Resume</span>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Mobile Portrait Layout -->
+      <div class="mobile-portrait-layout" id="mobilePortraitContainer">
+        <div class="mobile-section home" data-index="0">
+          <div class="mobile-card">
+            <i class="mobile-icon fas fa-home"></i>
+            <h2 class="mobile-title">Brad Cooley</h2>
+            <p class="mobile-description">Software & Data Engineer</p>
+            <div class="social-links" data-social-links>
+              <a
+                href="https://github.com/brad-cooley"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-link"
+                aria-label="GitHub Profile"
+              >
+                <i class="fab fa-github"></i>
+              </a>
+              <a
+                href="https://linkedin.com/in/bradcooley"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-link"
+                aria-label="LinkedIn Profile"
+              >
+                <i class="fab fa-linkedin"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Sections -->
+        <div class="mobile-section" data-index="1">
+          <div class="mobile-card">
+            <i class="mobile-icon fas fa-user"></i>
+            <h2 class="mobile-title">About</h2>
+            <p class="mobile-description">
+              Passionate developer creating elegant solutions to complex
+              problems. Focused on building applications that provide
+              exceptional user experiences.
+            </p>
+            <div class="mobile-badge">
+              <i class="fas fa-clock"></i>
+              <span>More details coming soon</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-section" data-index="2">
+          <div class="mobile-card">
+            <i class="mobile-icon fas fa-code"></i>
+            <h2 class="mobile-title">Projects</h2>
+            <p class="mobile-description">
+              Explore my latest work, from web applications to open-source
+              contributions. Each project represents a journey of learning and
+              innovation.
+            </p>
+            <div class="mobile-badge">
+              <i class="fas fa-rocket"></i>
+              <span>Showcase launching soon</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-section" data-index="3">
+          <div class="mobile-card">
+            <i class="mobile-icon fas fa-pen-fancy"></i>
+            <h2 class="mobile-title">Blog</h2>
+            <p class="mobile-description">
+              Dive into my thoughts on technology, development practices, and
+              industry trends. Knowledge sharing and learning journey
+              documentation.
+            </p>
+            <div class="mobile-badge">
+              <i class="fas fa-edit"></i>
+              <span>First posts coming soon</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-section" data-index="4">
+          <div class="mobile-card">
+            <i class="mobile-icon fas fa-user-tie"></i>
+            <h2 class="mobile-title">Resume</h2>
+            <p class="mobile-description">
+              Professional background, skills, and experience. A comprehensive
+              look at my career journey and technical expertise.
+            </p>
+            <div class="mobile-badge">
+              <i class="fas fa-file-alt"></i>
+              <span>Full resume coming soon</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scroll-indicator" id="scrollIndicator">
+          <div class="scroll-dot active" data-index="0"></div>
+          <div class="scroll-dot" data-index="1"></div>
+          <div class="scroll-dot" data-index="2"></div>
+          <div class="scroll-dot" data-index="3"></div>
+          <div class="scroll-dot" data-index="4"></div>
+        </div>
+
+        <!-- Slide-out Navigation Menu -->
+        <div class="scroll-menu" id="scrollMenu">
+          <div
+            class="scroll-menu-item active"
+            data-index="0"
+            role="button"
+            tabindex="0"
+          >
+            <i class="scroll-menu-icon fas fa-home"></i>
+            <span class="scroll-menu-label">Home</span>
+          </div>
+          <div
+            class="scroll-menu-item"
+            data-index="1"
+            role="button"
+            tabindex="0"
+          >
+            <i class="scroll-menu-icon fas fa-user"></i>
+            <span class="scroll-menu-label">About</span>
+          </div>
+          <div
+            class="scroll-menu-item"
+            data-index="2"
+            role="button"
+            tabindex="0"
+          >
+            <i class="scroll-menu-icon fas fa-code"></i>
+            <span class="scroll-menu-label">Projects</span>
+          </div>
+          <div
+            class="scroll-menu-item"
+            data-index="3"
+            role="button"
+            tabindex="0"
+          >
+            <i class="scroll-menu-icon fas fa-pen-fancy"></i>
+            <span class="scroll-menu-label">Blog</span>
+          </div>
+          <div
+            class="scroll-menu-item"
+            data-index="4"
+            role="button"
+            tabindex="0"
+          >
+            <i class="scroll-menu-icon fas fa-user-tie"></i>
+            <span class="scroll-menu-label">Resume</span>
+          </div>
+        </div>
+
+        <div class="scroll-menu-backdrop" id="scrollMenuBackdrop"></div>
+
+        <div class="scroll-hint">
+          <i class="fas fa-chevron-up"></i>
+          <span>Scroll to explore</span>
+        </div>
+      </div>
     </div>
     <script src="js/main.js"></script>
-</body>
+  </body>
 </html>

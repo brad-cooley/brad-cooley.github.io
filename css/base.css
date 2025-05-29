@@ -1,0 +1,252 @@
+:root {
+  /* Color system */
+  --text-color: #1e293b;
+  --text-color-dark: #f1f5f9;
+  --text-color-secondary: #64748b;
+  --background-color: #e2e8f0;
+  --background-color-dark: #0f172a;
+
+  /* Glass effect variables */
+  --glass-primary: rgba(255, 255, 255, 0.4);
+  --glass-primary-dark: rgba(15, 23, 42, 0.4);
+  --glass-secondary: rgba(255, 255, 255, 0.2);
+  --glass-secondary-dark: rgba(15, 23, 42, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-border-dark: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.25);
+  --glass-shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Gradients */
+  --accent-gradient: linear-gradient(
+    135deg,
+    #3b82f6 0%,
+    #8b5cf6 50%,
+    #ec4899 100%
+  );
+  --accent-gradient-dark: linear-gradient(
+    135deg,
+    #4f46e5 0%,
+    #7c3aed 50%,
+    #ec4899 100%
+  );
+  --gradient-colors: linear-gradient(
+    45deg,
+    #6366f1 0%,
+    #8b5cf6 33%,
+    #ec4899 66%,
+    #f59e0b 100%
+  );
+
+  /* Typography */
+  --font-heading: "Poppins", -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Helvetica Neue", sans-serif;
+  --font-body: "Lato", -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", sans-serif;
+
+  /* Transitions and timing */
+  --transition-fast: 0.2s ease;
+  --transition-smooth: 0.3s ease;
+  --transition-slow: 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  --animation-duration: 8s;
+}
+
+/* Modern CSS reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  font-size: 16px;
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-body);
+  line-height: 1.6;
+  color: var(--text-color);
+  background: var(--background-color);
+  position: relative;
+  transition: var(--transition-smooth);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Background system - Static gradient base */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--accent-gradient);
+  z-index: -2;
+}
+
+/* Background overlay for glass effect */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--background-color);
+  opacity: 0.75;
+  z-index: -1;
+}
+
+/* Core animations */
+@keyframes textGradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Utility classes for common patterns */
+.gradient-text {
+  background: var(--gradient-colors);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textGradient var(--animation-duration) ease infinite;
+}
+
+.glass-effect {
+  background: var(--glass-primary);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-effect-secondary {
+  background: var(--glass-secondary);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-color: var(--text-color-dark);
+    --background-color: var(--background-color-dark);
+    --glass-primary: var(--glass-primary-dark);
+    --glass-secondary: var(--glass-secondary-dark);
+    --glass-border: var(--glass-border-dark);
+    --glass-shadow: var(--glass-shadow-dark);
+    --accent-gradient: var(--accent-gradient-dark);
+  }
+
+  body::after {
+    background: var(--background-color-dark);
+    opacity: 0.85;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .scroll-hint {
+    display: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-border-dark: rgba(255, 255, 255, 0.6);
+  }
+
+  .nav-item:focus,
+  .social-link:focus,
+  .scroll-menu-item:focus {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+/* Print styles */
+@media print {
+  body::before,
+  body::after {
+    display: none;
+  }
+
+  .bottom-nav,
+  .scroll-indicator,
+  .scroll-menu,
+  .scroll-hint {
+    display: none;
+  }
+
+  .section {
+    page-break-inside: avoid;
+  }
+}
+
+/* Focus management for keyboard users */
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
+}
+
+/* Smooth scrolling for supported browsers */
+@supports (scroll-behavior: smooth) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Modern backdrop-filter fallback */
+@supports not (backdrop-filter: blur()) {
+  .glass-effect,
+  .glass-effect-secondary {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .glass-effect,
+    .glass-effect-secondary {
+      background: rgba(15, 23, 42, 0.9);
+    }
+  }
+}
