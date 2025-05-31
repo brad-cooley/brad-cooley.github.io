@@ -112,16 +112,34 @@ class PortfolioNavigator {
   }
 
   nextSection() {
-    const nextIndex = Math.min(
-      this.state.currentSection + 1,
-      this.totalSections - 1
-    );
-    this.goToSection(nextIndex);
+    if (this.state.currentSection < this.totalSections - 1) {
+      const nextIndex = this.state.currentSection + 1;
+      this.goToSection(nextIndex);
+    } else if (this.isMobilePortrait()) {
+      // Only bounce if already at the last section and trying to go further
+      this.addBounceEffect("end");
+    }
   }
 
   previousSection() {
-    const prevIndex = Math.max(this.state.currentSection - 1, 0);
-    this.goToSection(prevIndex);
+    if (this.state.currentSection > 0) {
+      const prevIndex = this.state.currentSection - 1;
+      this.goToSection(prevIndex);
+    } else if (this.isMobilePortrait()) {
+      // Only bounce if already at the first section and trying to go further
+      this.addBounceEffect("start");
+    }
+  }
+
+  addBounceEffect(direction) {
+    if (!this.elements.mobileContainer) return;
+
+    const container = this.elements.mobileContainer;
+    container.classList.add(`bounce-${direction}`);
+
+    setTimeout(() => {
+      container.classList.remove(`bounce-${direction}`);
+    }, 300);
   }
 
   // UI update methods
@@ -427,10 +445,18 @@ class PortfolioNavigator {
           if (Math.abs(deltaY) > threshold) {
             if (deltaY > 0) {
               // Swipe up - next section
-              this.nextSection();
+              if (this.state.currentSection < this.totalSections - 1) {
+                this.nextSection();
+              } else {
+                this.addBounceEffect("end");
+              }
             } else {
               // Swipe down - previous section
-              this.previousSection();
+              if (this.state.currentSection > 0) {
+                this.previousSection();
+              } else {
+                this.addBounceEffect("start");
+              }
             }
           }
         },

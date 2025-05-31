@@ -312,7 +312,6 @@
     position: relative;
     overflow: hidden;
     min-width: 60px;
-    border: 1px solid transparent;
   }
 
   .nav-item::before {
@@ -331,7 +330,6 @@
 
   .nav-item.active {
     background: var(--glass-secondary);
-    border-color: var(--glass-border);
   }
 
   .nav-icon {

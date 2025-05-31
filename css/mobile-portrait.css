@@ -31,7 +31,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem 1rem;
+    padding: 2rem 0;
+    padding-left: 2rem;
+    padding-right: 2.75rem;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     position: relative;
@@ -39,13 +41,10 @@
 
   /* Mobile cards */
   .mobile-card {
-    width: 90%;
-    max-width: 350px;
-    height: 75vh;
-    max-height: 600px;
+    width: 100%;
+    height: 75%;
     background: var(--glass-primary);
     backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
     border-radius: 24px;
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
@@ -72,6 +71,10 @@
     -webkit-mask-composite: subtract;
     opacity: 0.6;
     pointer-events: none;
+  }
+
+  .mobile-section:last-child {
+    scroll-snap-align: end;
   }
 
   /* Card content */
@@ -177,16 +180,16 @@
   /* Scroll indicator */
   .scroll-indicator {
     position: fixed;
-    right: 1rem;
+    right: 0;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
     z-index: 1000;
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 12px;
+    padding: 1rem;
+    border-radius: 16px;
     transition: var(--transition-smooth);
   }
 
@@ -196,12 +199,12 @@
   }
 
   .scroll-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: var(--glass-border);
     transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 0.5;
+    opacity: 0.4;
     pointer-events: none;
     position: relative;
     overflow: hidden;
@@ -218,9 +221,9 @@
   }
 
   .scroll-dot.active {
-    width: 8px;
-    height: 20px;
-    border-radius: 10px;
+    width: 10px;
+    height: 24px;
+    border-radius: 12px;
     opacity: 1;
   }
 
@@ -231,7 +234,7 @@
   /* Slide-out navigation menu */
   .scroll-menu {
     position: fixed;
-    right: 4rem;
+    right: 3rem;
     top: 50%;
     transform: translateY(-50%) translateX(10px);
     background: var(--glass-primary);
@@ -266,7 +269,6 @@
     font-size: 0.9rem;
     font-weight: 500;
     margin-bottom: 0.5rem;
-    border: 1px solid transparent;
   }
 
   .scroll-menu-item:last-child {
@@ -275,13 +277,11 @@
 
   .scroll-menu-item:hover {
     background: var(--glass-secondary);
-    border-color: var(--glass-border);
     transform: translateX(2px);
   }
 
   .scroll-menu-item.active {
     background: var(--glass-secondary);
-    border-color: var(--glass-border);
   }
 
   .scroll-menu-item.active .scroll-menu-icon {
@@ -393,6 +393,39 @@
     60% {
       transform: translateY(-3px);
     }
+  }
+
+  @keyframes bounceStart {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes bounceEnd {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  /* Bounce effect classes */
+  .mobile-portrait-layout.bounce-start {
+    animation: bounceStart 0.3s ease-out;
+  }
+
+  .mobile-portrait-layout.bounce-end {
+    animation: bounceEnd 0.3s ease-out;
   }
 
   /* Focus states for accessibility */
