@@ -77,6 +77,8 @@ class PortfolioNavigator {
     } else {
       this.goToDesktopSection(index, smoothTransition);
     }
+
+    this.updateProgressBar();
   }
 
   goToDesktopSection(index, smoothTransition = true) {
@@ -246,9 +248,10 @@ class PortfolioNavigator {
     this.state.initialTransform = this.getTransformX();
 
     if (this.elements.sectionsContainer) {
-      this.elements.sectionsContainer.style.cursor = "grabbing";
       this.elements.sectionsContainer.classList.add("no-transition");
     }
+
+    document.querySelector(".cursor")?.classList.add("is-dragging");
   }
 
   updateDrag(clientX) {
@@ -270,9 +273,10 @@ class PortfolioNavigator {
     this.state.isDragging = false;
 
     if (this.elements.sectionsContainer) {
-      this.elements.sectionsContainer.style.cursor = "grab";
       this.elements.sectionsContainer.classList.remove("no-transition");
     }
+
+    document.querySelector(".cursor")?.classList.remove("is-dragging");
 
     const deltaX = this.state.currentX - this.state.startX;
     const threshold = window.innerWidth * NAVIGATION_CONFIG.DRAG_THRESHOLD;
@@ -520,6 +524,58 @@ class PortfolioNavigator {
     );
   }
 
+  // Custom cursor tracking (fine-pointer / mouse only)
+  initCursor() {
+    const cursor = document.querySelector(".cursor");
+    if (!cursor || !window.matchMedia("(pointer: fine)").matches) return;
+
+    let rafPending = false;
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+
+    document.addEventListener("mousemove", (e) => {
+      x = e.clientX;
+      y = e.clientY;
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => {
+          cursor.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%))`;
+          rafPending = false;
+        });
+      }
+    });
+
+    document.addEventListener("mouseleave", () => {
+      cursor.style.opacity = "0";
+    });
+    document.addEventListener("mouseenter", () => {
+      cursor.style.opacity = "1";
+    });
+
+    const hoverTargets = document.querySelectorAll(
+      "a, button, [role='button'], .nav-item, .scroll-dot, .scroll-menu-item"
+    );
+    hoverTargets.forEach((el) => {
+      el.addEventListener("mouseenter", () =>
+        cursor.classList.add("is-hovering")
+      );
+      el.addEventListener("mouseleave", () =>
+        cursor.classList.remove("is-hovering")
+      );
+    });
+  }
+
+  // Thin progress bar across the top
+  updateProgressBar() {
+    const bar = document.getElementById("progressBar");
+    if (!bar) return;
+    const pct =
+      this.totalSections > 1
+        ? (this.state.currentSection / (this.totalSections - 1)) * 100
+        : 0;
+    bar.style.width = pct + "%";
+  }
+
   // Initialization
   init() {
     const hash = location.hash.slice(1);
@@ -527,6 +583,7 @@ class PortfolioNavigator {
 
     this.state.currentSection = idx !== -1 ? idx : 0;
     this.setupEventListeners();
+    this.initCursor();
 
     // Initialize after a brief delay to ensure DOM readiness
     setTimeout(() => {
