@@ -120,9 +120,25 @@
     color: var(--accent);
   }
 
-  /* Home name breathes in colour on mobile too */
+  /* Cosmic Orange gradient sweep — mirrors desktop */
   .mobile-name {
-    animation: nameColor 14s ease-in-out 2.5s infinite;
+    background: linear-gradient(
+      90deg,
+      var(--bg)   0%,
+      var(--ink)  10%,
+      var(--ink)  34%,
+      #BF4800     43%,
+      #F07218     50%,
+      #BF4800     57%,
+      var(--ink)  66%,
+      var(--ink)  90%,
+      var(--bg)  100%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: nameShimmer 18s ease-in-out 4s infinite;
   }
 
   .mobile-body-text {
@@ -334,13 +350,13 @@
   }
 
   .theme-toggle-icon {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    border: 1.5px solid var(--ink-3);
+    border: 1.5px solid var(--ink-2);
     position: relative;
     overflow: hidden;
-    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: rotate 600ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .theme-toggle-icon::before {
@@ -350,11 +366,15 @@
     left: 0;
     width: 50%;
     height: 100%;
-    background: var(--ink-3);
+    background: var(--ink-2);
   }
 
   [data-theme="dark"] .theme-toggle-icon {
-    transform: rotate(180deg);
+    rotate: 180deg;
+  }
+
+  .theme-toggle-icon.is-pulsing {
+    animation: togglePulse 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   /* ── Accessibility ──────────────────────────────────── */

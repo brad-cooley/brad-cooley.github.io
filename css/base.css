@@ -210,6 +210,20 @@ body {
   70%, 100% { color: var(--ink); }
 }
 
+/* Cosmic Orange gradient sweeps left→right, holds, returns */
+@keyframes nameShimmer {
+  0%, 8%     { background-position: 100% center; }
+  40%, 60%   { background-position: 0% center; }
+  92%, 100%  { background-position: 100% center; }
+}
+
+/* Toggle icon scale pulse on click */
+@keyframes togglePulse {
+  0%   { scale: 1; }
+  40%  { scale: 1.5; }
+  100% { scale: 1; }
+}
+
 /* ── Utility ────────────────────────────────────────────── */
 .sr-only {
   position: absolute;

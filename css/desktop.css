@@ -81,10 +81,27 @@
     font-weight: 800;
     line-height: 0.91;
     letter-spacing: -0.04em;
-    color: var(--ink);
+    /* Cosmic Orange gradient — fades to --bg at edges so name blends
+       with background; orange sweeps left→right via nameShimmer        */
+    background: linear-gradient(
+      90deg,
+      var(--bg)   0%,
+      var(--ink)  10%,
+      var(--ink)  34%,
+      #BF4800     43%,
+      #F07218     50%,
+      #BF4800     57%,
+      var(--ink)  66%,
+      var(--ink)  90%,
+      var(--bg)  100%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     animation:
-      fadeUp     var(--t-enter) var(--ease-out) 0.1s both,
-      nameColor  14s            ease-in-out     2.5s infinite;
+      fadeUp      var(--t-enter) var(--ease-out) 0.1s both,
+      nameShimmer 18s            ease-in-out     4s   infinite;
   }
 
   .home-rule {
@@ -329,15 +346,17 @@
   }
 
   .theme-toggle-icon {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    border: 1.5px solid var(--ink-3);
+    border: 1.5px solid var(--ink-2);
     position: relative;
     overflow: hidden;
+    /* rotate and scale are individual transform properties —
+       they animate independently so pulse and flip don't conflict */
     transition:
-      transform     500ms cubic-bezier(0.16, 1, 0.3, 1),
-      border-color  var(--t-base) var(--ease-out);
+      rotate       600ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color var(--t-base) var(--ease-out);
   }
 
   /* Left half filled = light-mode indicator at rest */
@@ -348,13 +367,18 @@
     left: 0;
     width: 50%;
     height: 100%;
-    background: var(--ink-3);
+    background: var(--ink-2);
     transition: background var(--t-base) var(--ease-out);
   }
 
-  /* Dark mode: rotate 180° so filled half is on the right */
+  /* Dark mode: flip so filled half is on the right */
   [data-theme="dark"] .theme-toggle-icon {
-    transform: rotate(180deg);
+    rotate: 180deg;
+  }
+
+  /* Scale pulse triggered by JS on click */
+  .theme-toggle-icon.is-pulsing {
+    animation: togglePulse 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .theme-toggle:hover .theme-toggle-icon {

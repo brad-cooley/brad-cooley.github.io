@@ -522,7 +522,7 @@ class PortfolioNavigator {
     );
   }
 
-  // Theme toggle: polished half-circle flip + smooth color transition
+  // Theme toggle: half-circle flip, scale pulse, flash overlay
   initTheme() {
     const toggle = document.getElementById("themeToggle");
     if (!toggle) return;
@@ -532,23 +532,44 @@ class PortfolioNavigator {
       const current = root.getAttribute("data-theme");
       const next = current === "dark" ? "light" : "dark";
 
-      // Pause name animation during transition so colour transitions cleanly
-      const h1 = document.querySelector(".home-name h1");
-      const mName = document.querySelector(".mobile-name");
-      if (h1) h1.style.animationPlayState = "paused";
-      if (mName) mName.style.animationPlayState = "paused";
+      const icon = toggle.querySelector(".theme-toggle-icon");
 
-      // Enable global colour transitions for every element
-      root.classList.add("is-theme-transitioning");
-      root.setAttribute("data-theme", next);
-      localStorage.setItem("theme", next);
+      // Scale-pulse the icon on click (scale and rotate animate independently)
+      if (icon) {
+        icon.classList.remove("is-pulsing");
+        void icon.offsetWidth; // force reflow to restart animation
+        icon.classList.add("is-pulsing");
+        icon.addEventListener("animationend", () =>
+          icon.classList.remove("is-pulsing"), { once: true }
+        );
+      }
 
-      // Remove transition class and resume animation after colours settle
-      setTimeout(() => {
-        root.classList.remove("is-theme-transitioning");
-        if (h1) h1.style.animationPlayState = "";
-        if (mName) mName.style.animationPlayState = "";
-      }, 560);
+      // Brief directional flash — white going to light, black going to dark
+      const flash = document.createElement("div");
+      flash.style.cssText = [
+        "position:fixed", "inset:0",
+        `background:${next === "light" ? "#fff" : "#000"}`,
+        "pointer-events:none", "z-index:99997", "opacity:0",
+        "transition:opacity 180ms ease-out",
+      ].join(";");
+      document.body.appendChild(flash);
+
+      requestAnimationFrame(() => {
+        flash.style.opacity = "0.12";
+
+        // Apply theme at peak flash so colour change feels instantaneous
+        setTimeout(() => {
+          root.classList.add("is-theme-transitioning");
+          root.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+
+          flash.style.opacity = "0";
+          setTimeout(() => flash.remove(), 200);
+        }, 90);
+      });
+
+      // Remove transition class after colours have settled
+      setTimeout(() => root.classList.remove("is-theme-transitioning"), 760);
     });
   }
 
