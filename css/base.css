@@ -56,9 +56,33 @@
   --t-section: 600ms;
 }
 
-/* ── Dark Mode ──────────────────────────────────────────── */
+/* ── Dark / Light via data-theme attribute ──────────────── */
+/* Applied before paint by inline script to prevent flash   */
+[data-theme="light"] {
+  --bg:         #F8F7F4;
+  --bg-raised:  #FFFFFF;
+  --ink:        #141412;
+  --ink-2:      #6B6A67;
+  --ink-3:      #B4B2AE;
+  --line:       #E5E3DF;
+  --accent:     #1246F0;
+  --accent-sub: rgba(18, 70, 240, 0.06);
+}
+
+[data-theme="dark"] {
+  --bg:         #0F0F0E;
+  --bg-raised:  #1A1A18;
+  --ink:        #F0EFE9;
+  --ink-2:      #8A8883;
+  --ink-3:      #555350;
+  --line:       #2D2C2A;
+  --accent:     #4F7BF7;
+  --accent-sub: rgba(79, 123, 247, 0.08);
+}
+
+/* Fallback for browsers without JS / no stored preference */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --bg:         #0F0F0E;
     --bg-raised:  #1A1A18;
     --ink:        #F0EFE9;
@@ -68,6 +92,17 @@
     --accent:     #4F7BF7;
     --accent-sub: rgba(79, 123, 247, 0.08);
   }
+}
+
+/* ── Smooth theme transition class ──────────────────────── */
+/* Added briefly by JS during theme toggle                  */
+.is-theme-transitioning,
+.is-theme-transitioning * {
+  transition:
+    background-color 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    color            500ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color     500ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow       500ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 /* ── Reset ──────────────────────────────────────────────── */
@@ -152,19 +187,6 @@ body {
   background-repeat: repeat;
 }
 
-/* ── Progress Bar ───────────────────────────────────────── */
-.progress-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 1.5px;
-  background: var(--accent);
-  z-index: 10000;
-  width: 0%;
-  transition: width var(--t-section) var(--ease-out);
-  pointer-events: none;
-}
-
 /* ── Keyframes ──────────────────────────────────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(18px); }
@@ -179,6 +201,13 @@ body {
 @keyframes lineExpand {
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
+}
+
+/* Name breathing: mostly --ink, quietly visits --accent, returns */
+@keyframes nameColor {
+  0%, 30%   { color: var(--ink); }
+  50%        { color: var(--accent); }
+  70%, 100% { color: var(--ink); }
 }
 
 /* ── Utility ────────────────────────────────────────────── */

@@ -117,7 +117,12 @@
     font-weight: 800;
     line-height: 0.95;
     letter-spacing: -0.03em;
-    color: var(--ink);
+    color: var(--accent);
+  }
+
+  /* Home name breathes in colour on mobile too */
+  .mobile-name {
+    animation: nameColor 14s ease-in-out 2.5s infinite;
   }
 
   .mobile-body-text {
@@ -309,6 +314,47 @@
     0%   { transform: translateY(0); }
     50%  { transform: translateY(-8px); }
     100% { transform: translateY(0); }
+  }
+
+  /* ── Theme Toggle — mobile positioning ─────────────── */
+  .theme-toggle {
+    position: fixed;
+    bottom: var(--sp-8);
+    left: var(--sp-8);
+    width: 36px;
+    height: 36px;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .theme-toggle-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-3);
+    position: relative;
+    overflow: hidden;
+    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .theme-toggle-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: var(--ink-3);
+  }
+
+  [data-theme="dark"] .theme-toggle-icon {
+    transform: rotate(180deg);
   }
 
   /* ── Accessibility ──────────────────────────────────── */

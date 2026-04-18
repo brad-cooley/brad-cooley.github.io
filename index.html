@@ -16,6 +16,14 @@
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/desktop.css" />
     <link rel="stylesheet" href="css/mobile-portrait.css" />
+    <!-- Set theme before paint to prevent flash -->
+    <script>
+      (function () {
+        var s = localStorage.getItem('theme');
+        var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', s || (d ? 'dark' : 'light'));
+      })();
+    </script>
   </head>
   <body>
     <!-- Custom cursor (fine-pointer / mouse only) -->
@@ -24,8 +32,10 @@
     <!-- Grain texture overlay -->
     <div class="grain" aria-hidden="true"></div>
 
-    <!-- Section progress indicator -->
-    <div class="progress-bar" id="progressBar" aria-hidden="true"></div>
+    <!-- Theme toggle — unique half-circle icon -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle color mode">
+      <span class="theme-toggle-icon" aria-hidden="true"></span>
+    </button>
 
     <div class="app-container">
 

@@ -77,8 +77,6 @@ class PortfolioNavigator {
     } else {
       this.goToDesktopSection(index, smoothTransition);
     }
-
-    this.updateProgressBar();
   }
 
   goToDesktopSection(index, smoothTransition = true) {
@@ -524,6 +522,36 @@ class PortfolioNavigator {
     );
   }
 
+  // Theme toggle: polished half-circle flip + smooth color transition
+  initTheme() {
+    const toggle = document.getElementById("themeToggle");
+    if (!toggle) return;
+
+    toggle.addEventListener("click", () => {
+      const root = document.documentElement;
+      const current = root.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+
+      // Pause name animation during transition so colour transitions cleanly
+      const h1 = document.querySelector(".home-name h1");
+      const mName = document.querySelector(".mobile-name");
+      if (h1) h1.style.animationPlayState = "paused";
+      if (mName) mName.style.animationPlayState = "paused";
+
+      // Enable global colour transitions for every element
+      root.classList.add("is-theme-transitioning");
+      root.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+
+      // Remove transition class and resume animation after colours settle
+      setTimeout(() => {
+        root.classList.remove("is-theme-transitioning");
+        if (h1) h1.style.animationPlayState = "";
+        if (mName) mName.style.animationPlayState = "";
+      }, 560);
+    });
+  }
+
   // Custom cursor tracking (fine-pointer / mouse only)
   initCursor() {
     const cursor = document.querySelector(".cursor");
@@ -565,17 +593,6 @@ class PortfolioNavigator {
     });
   }
 
-  // Thin progress bar across the top
-  updateProgressBar() {
-    const bar = document.getElementById("progressBar");
-    if (!bar) return;
-    const pct =
-      this.totalSections > 1
-        ? (this.state.currentSection / (this.totalSections - 1)) * 100
-        : 0;
-    bar.style.width = pct + "%";
-  }
-
   // Initialization
   init() {
     const hash = location.hash.slice(1);
@@ -583,6 +600,7 @@ class PortfolioNavigator {
 
     this.state.currentSection = idx !== -1 ? idx : 0;
     this.setupEventListeners();
+    this.initTheme();
     this.initCursor();
 
     // Initialize after a brief delay to ensure DOM readiness
