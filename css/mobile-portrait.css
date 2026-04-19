@@ -140,6 +140,16 @@
     line-height: 1.72;
   }
 
+  /* ── Mobile about with particle portrait ───────── */
+  .mobile-about-content {
+    gap: var(--sp-3);
+  }
+
+  .mobile-particle-portrait {
+    width: 100%;
+    height: 180px;
+  }
+
   .mobile-wip {
     font-family: var(--font-mono);
     font-size: var(--text-xs);

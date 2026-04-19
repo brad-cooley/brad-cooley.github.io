@@ -81,14 +81,20 @@
           </section>
 
           <!-- 02 · About ─────────────────────────────── -->
-          <section class="section" data-section="about">
+          <section class="section about-section" data-section="about">
             <div class="section-ghost-num" aria-hidden="true">02</div>
-            <div class="section-inner">
-              <div class="section-label-col">
+            <div class="about-layout">
+              <div class="about-portrait-col">
+                <div
+                  class="particle-portrait-container"
+                  data-particle-portrait="assets/img/headshot.png"
+                  data-particle-gap="3"
+                  data-particle-size="2"
+                ></div>
+              </div>
+              <div class="about-text-col">
                 <span class="section-eyebrow">02 — About</span>
                 <h2 class="section-title">Who<br />I&nbsp;am.</h2>
-              </div>
-              <div class="section-text-col">
                 <p class="section-body-text">
                   Passionate developer creating elegant solutions to complex
                   problems. Focused on building applications that provide
@@ -248,8 +254,14 @@
 
         <!-- 02 · About -->
         <div class="mobile-section" data-index="1">
-          <div class="mobile-content">
+          <div class="mobile-content mobile-about-content">
             <div class="mobile-eyebrow">02 / 05</div>
+            <div
+              class="particle-portrait-container mobile-particle-portrait"
+              data-particle-portrait="assets/img/headshot.png"
+              data-particle-gap="4"
+              data-particle-size="1.5"
+            ></div>
             <h2 class="mobile-section-title">About</h2>
             <div class="mobile-rule"></div>
             <p class="mobile-body-text">
@@ -379,6 +391,7 @@
     </div>
     <!-- /app-container -->
 
+    <script src="js/particle-portrait.js"></script>
     <script src="js/main.js"></script>
   </body>
 </html>

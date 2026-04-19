@@ -263,6 +263,19 @@ body {
   border-radius: 2px;
 }
 
+/* ── Particle Portrait ──────────────────────────── */
+.particle-portrait-container {
+  overflow: hidden;
+  line-height: 0;
+}
+
+.particle-portrait-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
