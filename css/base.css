@@ -12,8 +12,11 @@
   --ink-2:      #6B6A67;
   --ink-3:      #B4B2AE;
   --line:       #E5E3DF;
-  --accent:     #1246F0;
-  --accent-sub: rgba(18, 70, 240, 0.06);
+  --accent:         #1246F0;
+  --accent-sub:     rgba(18, 70, 240, 0.06);
+  --cosmic-orange:       #F07218;
+  --cosmic-orange-deep:  #BF4800;
+  --section-title-color: var(--cosmic-orange);
 
   /* Typography */
   --font-display: 'Syne', sans-serif;
@@ -67,6 +70,10 @@
   --line:       #E5E3DF;
   --accent:     #1246F0;
   --accent-sub: rgba(18, 70, 240, 0.06);
+  --cosmic-orange:       #F07218;
+  --cosmic-orange-deep:  #BF4800;
+  --cosmic-orange-sub:   rgba(240, 114, 24, 0.08);
+  --section-title-color: var(--cosmic-orange);
 }
 
 [data-theme="dark"] {
@@ -78,6 +85,10 @@
   --line:       #2D2C2A;
   --accent:     #4F7BF7;
   --accent-sub: rgba(79, 123, 247, 0.08);
+  --cosmic-orange:       #CC6420;
+  --cosmic-orange-deep:  #A04200;
+  --cosmic-orange-sub:   rgba(204, 100, 32, 0.10);
+  --section-title-color: var(--cosmic-orange-deep);
 }
 
 /* Fallback for browsers without JS / no stored preference */
@@ -91,6 +102,9 @@
     --line:       #2D2C2A;
     --accent:     #4F7BF7;
     --accent-sub: rgba(79, 123, 247, 0.08);
+    --cosmic-orange:      #CC6420;
+    --cosmic-orange-deep: #A04200;
+    --cosmic-orange-sub:  rgba(204, 100, 32, 0.10);
   }
 }
 
@@ -217,13 +231,6 @@ body {
   92%, 100%  { background-position: 100% center; }
 }
 
-/* Toggle icon scale pulse on click */
-@keyframes togglePulse {
-  0%   { scale: 1; }
-  40%  { scale: 1.5; }
-  100% { scale: 1; }
-}
-
 /* ── Utility ────────────────────────────────────────────── */
 .sr-only {
   position: absolute;
@@ -238,7 +245,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--cosmic-orange);
   outline-offset: 3px;
   border-radius: 2px;
 }

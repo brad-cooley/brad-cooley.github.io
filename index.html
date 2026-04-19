@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,9 +19,12 @@
     <!-- Set theme before paint to prevent flash -->
     <script>
       (function () {
-        var s = localStorage.getItem('theme');
-        var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.setAttribute('data-theme', s || (d ? 'dark' : 'light'));
+        var s = localStorage.getItem("theme");
+        var d = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.setAttribute(
+          "data-theme",
+          s || (d ? "dark" : "light"),
+        );
       })();
     </script>
   </head>
@@ -33,41 +36,45 @@
     <div class="grain" aria-hidden="true"></div>
 
     <!-- Theme toggle — unique half-circle icon -->
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle color mode">
+    <button
+      class="theme-toggle"
+      id="themeToggle"
+      aria-label="Toggle color mode"
+    >
       <span class="theme-toggle-icon" aria-hidden="true"></span>
     </button>
 
     <div class="app-container">
-
       <!-- ════════════════════════════════════════════════
            DESKTOP LAYOUT  ≥ 768px
            ════════════════════════════════════════════════ -->
       <div class="desktop-layout">
         <div class="sections-container">
-
           <!-- 01 · Home ─────────────────────────────── -->
           <section class="section home-section active">
             <div class="section-ghost-num" aria-hidden="true">01</div>
             <div class="home-content">
               <div class="home-name">
-                <h1>Brad<br>Cooley</h1>
+                <h1>Brad<br />Cooley</h1>
               </div>
               <div class="home-rule"></div>
               <div class="home-footer">
-                <p class="home-title">Software &amp; Data Engineer</p>
+                <p class="home-title">Lead Data Engineer @ Mutually Human</p>
                 <div class="home-links">
                   <a
                     href="https://github.com/brad-cooley"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="GitHub Profile"
-                  >GitHub<span class="link-arrow">↗</span></a>
+                    >GitHub<span class="link-arrow">↗</span></a
+                  >
                   <a
                     href="https://linkedin.com/in/bradcooley"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn Profile"
-                  >LinkedIn<span class="link-arrow">↗</span></a>
+                    >LinkedIn<span class="link-arrow">↗</span></a
+                  >
                 </div>
               </div>
             </div>
@@ -79,7 +86,7 @@
             <div class="section-inner">
               <div class="section-label-col">
                 <span class="section-eyebrow">02 — About</span>
-                <h2 class="section-title">Who<br>I&nbsp;am.</h2>
+                <h2 class="section-title">Who<br />I&nbsp;am.</h2>
               </div>
               <div class="section-text-col">
                 <p class="section-body-text">
@@ -98,7 +105,7 @@
             <div class="section-inner">
               <div class="section-label-col">
                 <span class="section-eyebrow">03 — Projects</span>
-                <h2 class="section-title">What<br>I&nbsp;build.</h2>
+                <h2 class="section-title">What<br />I&nbsp;build.</h2>
               </div>
               <div class="section-text-col">
                 <p class="section-body-text">
@@ -117,7 +124,7 @@
             <div class="section-inner">
               <div class="section-label-col">
                 <span class="section-eyebrow">04 — Writing</span>
-                <h2 class="section-title">How<br>I&nbsp;think.</h2>
+                <h2 class="section-title">How<br />I&nbsp;think.</h2>
               </div>
               <div class="section-text-col">
                 <p class="section-body-text">
@@ -135,24 +142,25 @@
             <div class="section-inner">
               <div class="section-label-col">
                 <span class="section-eyebrow">05 — Resume</span>
-                <h2 class="section-title">What<br>I've done.</h2>
+                <h2 class="section-title">What<br />I've done.</h2>
               </div>
               <div class="section-text-col">
                 <p class="section-body-text">
                   Professional background, technical skills, and experience. A
-                  comprehensive look at my career journey as a software and
-                  data engineer.
+                  comprehensive look at my career journey as a software and data
+                  engineer.
                 </p>
                 <span class="section-wip">— Full resume arriving soon</span>
               </div>
             </div>
           </section>
-
-        </div><!-- /sections-container -->
+        </div>
+        <!-- /sections-container -->
 
         <!-- Navigation ─────────────────────────────── -->
         <nav class="bottom-nav" aria-label="Site navigation">
           <div class="nav-container" data-nav-container>
+            <div class="nav-indicator" aria-hidden="true"></div>
             <div
               class="nav-item active"
               data-section="0"
@@ -203,37 +211,37 @@
               <span class="nav-num">05</span>
               <span class="nav-label">Resume</span>
             </div>
-            <span class="nav-year" aria-hidden="true">2025</span>
           </div>
         </nav>
-      </div><!-- /desktop-layout -->
-
+      </div>
+      <!-- /desktop-layout -->
 
       <!-- ════════════════════════════════════════════════
            MOBILE PORTRAIT LAYOUT  ≤ 767px portrait
            ════════════════════════════════════════════════ -->
       <div class="mobile-portrait-layout" id="mobilePortraitContainer">
-
         <!-- 01 · Home -->
         <div class="mobile-section home" data-index="0">
           <div class="mobile-content">
             <div class="mobile-eyebrow">01 / 05</div>
-            <h2 class="mobile-name">Brad<br>Cooley</h2>
+            <h2 class="mobile-name">Brad<br />Cooley</h2>
             <div class="mobile-rule"></div>
-            <p class="mobile-role">Software &amp; Data Engineer</p>
+            <p class="mobile-role">Lead Data Engineer @ Mutually Human</p>
             <div class="mobile-links">
               <a
                 href="https://github.com/brad-cooley"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub Profile"
-              >GitHub<span class="link-arrow">↗</span></a>
+                >GitHub<span class="link-arrow">↗</span></a
+              >
               <a
                 href="https://linkedin.com/in/bradcooley"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn Profile"
-              >LinkedIn<span class="link-arrow">↗</span></a>
+                >LinkedIn<span class="link-arrow">↗</span></a
+              >
             </div>
           </div>
         </div>
@@ -295,7 +303,11 @@
         </div>
 
         <!-- Navigation dots -->
-        <div class="scroll-indicator" id="scrollIndicator" aria-label="Navigate sections">
+        <div
+          class="scroll-indicator"
+          id="scrollIndicator"
+          aria-label="Navigate sections"
+        >
           <div class="scroll-dot active" data-index="0"></div>
           <div class="scroll-dot" data-index="1"></div>
           <div class="scroll-dot" data-index="2"></div>
@@ -304,24 +316,53 @@
         </div>
 
         <!-- Slide-out menu -->
-        <nav class="scroll-menu" id="scrollMenu" aria-label="Section navigation">
-          <div class="scroll-menu-item active" data-index="0" role="button" tabindex="0">
+        <nav
+          class="scroll-menu"
+          id="scrollMenu"
+          aria-label="Section navigation"
+        >
+          <div
+            class="scroll-menu-item active"
+            data-index="0"
+            role="button"
+            tabindex="0"
+          >
             <span class="scroll-menu-num">01</span>
             <span class="scroll-menu-label">Home</span>
           </div>
-          <div class="scroll-menu-item" data-index="1" role="button" tabindex="0">
+          <div
+            class="scroll-menu-item"
+            data-index="1"
+            role="button"
+            tabindex="0"
+          >
             <span class="scroll-menu-num">02</span>
             <span class="scroll-menu-label">About</span>
           </div>
-          <div class="scroll-menu-item" data-index="2" role="button" tabindex="0">
+          <div
+            class="scroll-menu-item"
+            data-index="2"
+            role="button"
+            tabindex="0"
+          >
             <span class="scroll-menu-num">03</span>
             <span class="scroll-menu-label">Projects</span>
           </div>
-          <div class="scroll-menu-item" data-index="3" role="button" tabindex="0">
+          <div
+            class="scroll-menu-item"
+            data-index="3"
+            role="button"
+            tabindex="0"
+          >
             <span class="scroll-menu-num">04</span>
             <span class="scroll-menu-label">Writing</span>
           </div>
-          <div class="scroll-menu-item" data-index="4" role="button" tabindex="0">
+          <div
+            class="scroll-menu-item"
+            data-index="4"
+            role="button"
+            tabindex="0"
+          >
             <span class="scroll-menu-num">05</span>
             <span class="scroll-menu-label">Resume</span>
           </div>
@@ -333,10 +374,10 @@
           <div class="scroll-hint-line"></div>
           <span>Scroll</span>
         </div>
-
-      </div><!-- /mobile-portrait-layout -->
-
-    </div><!-- /app-container -->
+      </div>
+      <!-- /mobile-portrait-layout -->
+    </div>
+    <!-- /app-container -->
 
     <script src="js/main.js"></script>
   </body>

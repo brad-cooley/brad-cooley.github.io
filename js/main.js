@@ -2,9 +2,10 @@
 const NAVIGATION_CONFIG = {
   SECTION_NAMES: ["home", "about", "projects", "blog", "resume"],
   DRAG_THRESHOLD: 0.2,
-  WHEEL_THRESHOLD: 50,
+  WHEEL_THRESHOLD: 25,
   RESIZE_DEBOUNCE: 150,
   ORIENTATION_DELAY: 500,
+  TRANSITION_LOCK_MS: 650, // matches --t-section (600ms) + small buffer
 };
 
 class PortfolioNavigator {
@@ -17,6 +18,8 @@ class PortfolioNavigator {
       initialTransform: 0,
     };
 
+    this.isTransitioning = false;
+
     this.elements = this.cacheElements();
     this.totalSections = this.elements.sections.length;
 
@@ -28,6 +31,7 @@ class PortfolioNavigator {
       sectionsContainer: document.querySelector(".sections-container"),
       sections: Array.from(document.querySelectorAll(".section")),
       navItems: Array.from(document.querySelectorAll(".nav-item")),
+      navIndicator: document.querySelector(".nav-indicator"),
       mobileSections: Array.from(document.querySelectorAll(".mobile-section")),
       scrollDots: Array.from(document.querySelectorAll(".scroll-dot")),
       mobileContainer: document.getElementById("mobilePortraitContainer"),
@@ -67,6 +71,14 @@ class PortfolioNavigator {
   }
 
   // Navigation methods
+  startTransition() {
+    this.isTransitioning = true;
+    clearTimeout(this.transitionTimeout);
+    this.transitionTimeout = setTimeout(() => {
+      this.isTransitioning = false;
+    }, NAVIGATION_CONFIG.TRANSITION_LOCK_MS);
+  }
+
   goToSection(index, smoothTransition = true) {
     if (index < 0 || index >= this.totalSections) return;
 
@@ -147,6 +159,16 @@ class PortfolioNavigator {
     this.elements.navItems.forEach((item, idx) => {
       item.classList.toggle("active", idx === this.state.currentSection);
     });
+
+    const activeItem = this.elements.navItems[this.state.currentSection];
+    if (activeItem && this.elements.navIndicator) {
+      const indicator = this.elements.navIndicator;
+      const isFirstPlacement = !indicator.style.left;
+      if (isFirstPlacement) indicator.style.transition = "none";
+      indicator.style.left = `${activeItem.offsetLeft}px`;
+      indicator.style.width = `${activeItem.offsetWidth}px`;
+      if (isFirstPlacement) requestAnimationFrame(() => { indicator.style.transition = ""; });
+    }
 
     this.elements.sections.forEach((sec, i) => {
       sec.classList.toggle("active", i === this.state.currentSection);
@@ -300,9 +322,12 @@ class PortfolioNavigator {
     if (this.isMobilePortrait()) return;
     e.preventDefault();
 
+    if (this.isTransitioning) return;
+
     const delta = e.deltaX || e.deltaY;
 
     if (Math.abs(delta) > NAVIGATION_CONFIG.WHEEL_THRESHOLD) {
+      this.startTransition();
       delta > 0 ? this.nextSection() : this.previousSection();
     }
   }
@@ -312,12 +337,18 @@ class PortfolioNavigator {
       case "ArrowLeft":
       case "ArrowUp":
         e.preventDefault();
-        this.previousSection();
+        if (!this.isTransitioning) {
+          this.startTransition();
+          this.previousSection();
+        }
         break;
       case "ArrowRight":
       case "ArrowDown":
         e.preventDefault();
-        this.nextSection();
+        if (!this.isTransitioning) {
+          this.startTransition();
+          this.nextSection();
+        }
         break;
       default:
         const num = parseInt(e.key);
@@ -522,7 +553,9 @@ class PortfolioNavigator {
     );
   }
 
-  // Theme toggle: half-circle flip, scale pulse, flash overlay
+  // Theme toggle: cross-fade via View Transitions API.
+  // The browser snapshots before/after and crossfades between them.
+  // Fallback for browsers without View Transitions: instant swap.
   initTheme() {
     const toggle = document.getElementById("themeToggle");
     if (!toggle) return;
@@ -532,44 +565,21 @@ class PortfolioNavigator {
       const current = root.getAttribute("data-theme");
       const next = current === "dark" ? "light" : "dark";
 
-      const icon = toggle.querySelector(".theme-toggle-icon");
+      const applyTheme = () => {
+        root.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+      };
 
-      // Scale-pulse the icon on click (scale and rotate animate independently)
-      if (icon) {
-        icon.classList.remove("is-pulsing");
-        void icon.offsetWidth; // force reflow to restart animation
-        icon.classList.add("is-pulsing");
-        icon.addEventListener("animationend", () =>
-          icon.classList.remove("is-pulsing"), { once: true }
-        );
+      // Fallback: no View Transitions support or user prefers reduced motion
+      if (
+        !document.startViewTransition ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        applyTheme();
+        return;
       }
 
-      // Brief directional flash — white going to light, black going to dark
-      const flash = document.createElement("div");
-      flash.style.cssText = [
-        "position:fixed", "inset:0",
-        `background:${next === "light" ? "#fff" : "#000"}`,
-        "pointer-events:none", "z-index:99997", "opacity:0",
-        "transition:opacity 180ms ease-out",
-      ].join(";");
-      document.body.appendChild(flash);
-
-      requestAnimationFrame(() => {
-        flash.style.opacity = "0.12";
-
-        // Apply theme at peak flash so colour change feels instantaneous
-        setTimeout(() => {
-          root.classList.add("is-theme-transitioning");
-          root.setAttribute("data-theme", next);
-          localStorage.setItem("theme", next);
-
-          flash.style.opacity = "0";
-          setTimeout(() => flash.remove(), 200);
-        }, 90);
-      });
-
-      // Remove transition class after colours have settled
-      setTimeout(() => root.classList.remove("is-theme-transitioning"), 760);
+      document.startViewTransition(applyTheme);
     });
   }
 

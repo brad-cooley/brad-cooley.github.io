@@ -4,7 +4,6 @@
    ========================================================= */
 
 @media (max-width: 767px) and (orientation: portrait) {
-
   /* ── Layout ─────────────────────────────────────────── */
   .desktop-layout {
     display: none;
@@ -17,7 +16,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -33,9 +31,9 @@
     height: 100vh;
     width: 100vw;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-start;
-    padding: var(--sp-12) var(--sp-8);
+    padding: 22vh var(--sp-8) var(--sp-12);
     padding-right: calc(var(--sp-8) + 24px);
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -70,7 +68,7 @@
   }
 
   .mobile-rule {
-    width: 100%;
+    width: 32px;
     height: 1px;
     background: var(--line);
   }
@@ -117,28 +115,34 @@
     font-weight: 800;
     line-height: 0.95;
     letter-spacing: -0.03em;
-    color: var(--accent);
-  }
-
-  /* Cosmic Orange gradient sweep — mirrors desktop */
-  .mobile-name {
-    background: linear-gradient(
-      90deg,
-      var(--bg)   0%,
-      var(--ink)  10%,
-      var(--ink)  34%,
-      #BF4800     43%,
-      #F07218     50%,
-      #BF4800     57%,
-      var(--ink)  66%,
-      var(--ink)  90%,
-      var(--bg)  100%
-    );
-    background-size: 200% 100%;
+    background:
+      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.70' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='256' height='256' filter='url(%23n)' opacity='0.14'/></svg>")
+        repeat,
+      var(--section-title-color);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: nameShimmer 18s ease-in-out 4s infinite;
+  }
+
+  /* Cosmic Orange fades left→right into background; metallic noise
+     grain layered via SVG feTurbulence, both clipped to text.
+     mask-image fades the whole rendering so noise opacity tracks the
+     color gradient — grain vanishes exactly where the color does.     */
+  .mobile-name {
+    background:
+      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.70' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='256' height='256' filter='url(%23n)' opacity='0.14'/></svg>")
+        repeat,
+      linear-gradient(
+        to right,
+        var(--cosmic-orange) 0%,
+        var(--cosmic-orange-deep) 20%,
+        var(--bg) 94%
+      );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-mask-image: linear-gradient(to right, black 0%, transparent 94%);
+    mask-image: linear-gradient(to right, black 0%, transparent 94%);
   }
 
   .mobile-body-text {
@@ -172,21 +176,20 @@
   }
 
   .scroll-dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 99px;
+    width: 2px;
+    height: 2px;
+    border-radius: 0;
     background: var(--ink-3);
     transition:
       height 220ms var(--ease-out),
-      background 220ms var(--ease-out),
-      opacity 220ms;
-    opacity: 0.45;
+      background 220ms var(--ease-out);
+    opacity: 1;
     pointer-events: none;
   }
 
   .scroll-dot.active {
     height: 20px;
-    background: var(--ink);
+    background: var(--cosmic-orange);
     opacity: 1;
   }
 
@@ -198,8 +201,8 @@
     transform: translateY(-50%) translateX(8px);
     background: var(--bg);
     border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: var(--sp-3);
+    border-radius: 0;
+    padding: var(--sp-2) 0;
     min-width: 172px;
     opacity: 0;
     visibility: hidden;
@@ -221,21 +224,28 @@
     align-items: center;
     gap: var(--sp-3);
     padding: var(--sp-3) var(--sp-4);
-    border-radius: 8px;
-    color: var(--ink-2);
-    transition: background var(--t-fast), color var(--t-fast);
+    border-left: 2px solid transparent;
+    color: var(--ink-3);
+    transition:
+      border-color var(--t-fast),
+      color var(--t-fast);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
 
   .scroll-menu-item:not(:last-child) {
-    margin-bottom: 2px;
+    margin-bottom: 0;
   }
 
-  .scroll-menu-item:hover,
-  .scroll-menu-item.active {
-    background: var(--accent-sub);
+  .scroll-menu-item:hover {
+    background: none;
+    border-left-color: var(--cosmic-orange);
     color: var(--ink);
+  }
+
+  .scroll-menu-item.active {
+    background: none;
+    border-left-color: var(--cosmic-orange);
   }
 
   .scroll-menu-num {
@@ -244,20 +254,23 @@
     color: var(--ink-3);
     letter-spacing: 0.04em;
     flex-shrink: 0;
+    transition: color var(--t-fast);
   }
 
   .scroll-menu-item.active .scroll-menu-num {
-    color: var(--accent);
+    color: var(--cosmic-orange);
   }
 
   .scroll-menu-label {
     font-family: var(--font-body);
     font-size: var(--text-sm);
     font-weight: 400;
+    transition: color var(--t-fast);
   }
 
   .scroll-menu-item.active .scroll-menu-label {
     font-weight: 500;
+    color: var(--cosmic-orange);
   }
 
   /* ── Backdrop ───────────────────────────────────────── */
@@ -316,20 +329,40 @@
 
   /* ── Keyframes ──────────────────────────────────────── */
   @keyframes hintFade {
-    0%, 100% { opacity: 0; transform: translateY(6px); }
-    25%, 75%  { opacity: 1; transform: translateY(0); }
+    0%,
+    100% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    25%,
+    75% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @keyframes bounceDown {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(8px); }
-    100% { transform: translateY(0); }
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(8px);
+    }
+    100% {
+      transform: translateY(0);
+    }
   }
 
   @keyframes bounceUp {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(-8px); }
-    100% { transform: translateY(0); }
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+    100% {
+      transform: translateY(0);
+    }
   }
 
   /* ── Theme Toggle — mobile positioning ─────────────── */
@@ -360,7 +393,7 @@
   }
 
   .theme-toggle-icon::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -379,7 +412,7 @@
 
   /* ── Accessibility ──────────────────────────────────── */
   .scroll-menu-item:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--cosmic-orange);
     outline-offset: 2px;
   }
 }

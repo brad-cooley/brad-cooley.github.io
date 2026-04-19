@@ -4,7 +4,6 @@
    ========================================================= */
 
 @media (min-width: 768px) {
-
   /* ── Layout ─────────────────────────────────────────── */
   .mobile-portrait-layout {
     display: none;
@@ -81,27 +80,25 @@
     font-weight: 800;
     line-height: 0.91;
     letter-spacing: -0.04em;
-    /* Cosmic Orange gradient — fades to --bg at edges so name blends
-       with background; orange sweeps left→right via nameShimmer        */
-    background: linear-gradient(
-      90deg,
-      var(--bg)   0%,
-      var(--ink)  10%,
-      var(--ink)  34%,
-      #BF4800     43%,
-      #F07218     50%,
-      #BF4800     57%,
-      var(--ink)  66%,
-      var(--ink)  90%,
-      var(--bg)  100%
-    );
-    background-size: 200% 100%;
+    /* Cosmic Orange fades left→right into background; metallic noise
+       grain is layered on top via SVG feTurbulence, both clipped to text.
+       mask-image fades the whole rendering so noise opacity tracks the
+       color gradient — grain vanishes exactly where the color does.     */
+    background:
+      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.70' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='256' height='256' filter='url(%23n)' opacity='0.14'/></svg>")
+        repeat,
+      linear-gradient(
+        to right,
+        var(--cosmic-orange) 0%,
+        var(--cosmic-orange-deep) 20%,
+        var(--bg) 94%
+      );
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation:
-      fadeUp      var(--t-enter) var(--ease-out) 0.1s both,
-      nameShimmer 18s            ease-in-out     4s   infinite;
+    -webkit-mask-image: linear-gradient(to right, black 0%, transparent 94%);
+    mask-image: linear-gradient(to right, black 0%, transparent 94%);
+    animation: fadeUp var(--t-enter) var(--ease-out) 0.1s both;
   }
 
   .home-rule {
@@ -147,13 +144,13 @@
   }
 
   .home-links a::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 1px;
-    background: var(--accent);
+    background: var(--cosmic-orange);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform var(--t-slow) var(--ease-out);
@@ -206,7 +203,13 @@
     font-weight: 800;
     line-height: 0.95;
     letter-spacing: -0.03em;
-    color: var(--accent);
+    background:
+      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.70' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='256' height='256' filter='url(%23n)' opacity='0.14'/></svg>")
+        repeat,
+      var(--section-title-color);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .section-text-col {
@@ -251,6 +254,17 @@
     align-items: stretch;
     padding: 0 clamp(var(--sp-8), 5vw, var(--sp-16));
     flex: 1;
+    position: relative;
+  }
+
+  /* Sliding active indicator */
+  .nav-indicator {
+    position: absolute;
+    top: -1px;
+    height: 2px;
+    background: var(--cosmic-orange);
+    transition: left var(--t-slow) var(--ease-out), width var(--t-slow) var(--ease-out);
+    pointer-events: none;
   }
 
   .nav-item {
@@ -270,24 +284,20 @@
 
   /* Animated top-edge indicator line */
   .nav-item::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -1px;
     left: 0;
     right: 0;
     height: 2px;
-    background: var(--ink);
+    background: var(--cosmic-orange);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform var(--t-slow) var(--ease-out);
   }
 
   .nav-item.active {
-    color: var(--ink);
-  }
-
-  .nav-item.active::before {
-    transform: scaleX(1);
+    color: var(--cosmic-orange);
   }
 
   .nav-item:hover:not(.active) {
@@ -352,16 +362,14 @@
     border: 1.5px solid var(--ink-2);
     position: relative;
     overflow: hidden;
-    /* rotate and scale are individual transform properties —
-       they animate independently so pulse and flip don't conflict */
     transition:
-      rotate       600ms cubic-bezier(0.16, 1, 0.3, 1),
+      rotate var(--t-slow) cubic-bezier(0.16, 1, 0.3, 1),
       border-color var(--t-base) var(--ease-out);
   }
 
   /* Left half filled = light-mode indicator at rest */
   .theme-toggle-icon::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -374,11 +382,6 @@
   /* Dark mode: flip so filled half is on the right */
   [data-theme="dark"] .theme-toggle-icon {
     rotate: 180deg;
-  }
-
-  /* Scale pulse triggered by JS on click */
-  .theme-toggle-icon.is-pulsing {
-    animation: togglePulse 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .theme-toggle:hover .theme-toggle-icon {
