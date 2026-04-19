@@ -2,9 +2,10 @@
 const NAVIGATION_CONFIG = {
   SECTION_NAMES: ["home", "about", "projects", "blog", "resume"],
   DRAG_THRESHOLD: 0.2,
-  WHEEL_THRESHOLD: 50,
+  WHEEL_THRESHOLD: 25,
   RESIZE_DEBOUNCE: 150,
   ORIENTATION_DELAY: 500,
+  TRANSITION_LOCK_MS: 650, // matches --t-section (600ms) + small buffer
 };
 
 class PortfolioNavigator {
@@ -17,6 +18,8 @@ class PortfolioNavigator {
       initialTransform: 0,
     };
 
+    this.isTransitioning = false;
+
     this.elements = this.cacheElements();
     this.totalSections = this.elements.sections.length;
 
@@ -28,6 +31,7 @@ class PortfolioNavigator {
       sectionsContainer: document.querySelector(".sections-container"),
       sections: Array.from(document.querySelectorAll(".section")),
       navItems: Array.from(document.querySelectorAll(".nav-item")),
+      navIndicator: document.querySelector(".nav-indicator"),
       mobileSections: Array.from(document.querySelectorAll(".mobile-section")),
       scrollDots: Array.from(document.querySelectorAll(".scroll-dot")),
       mobileContainer: document.getElementById("mobilePortraitContainer"),
@@ -67,6 +71,14 @@ class PortfolioNavigator {
   }
 
   // Navigation methods
+  startTransition() {
+    this.isTransitioning = true;
+    clearTimeout(this.transitionTimeout);
+    this.transitionTimeout = setTimeout(() => {
+      this.isTransitioning = false;
+    }, NAVIGATION_CONFIG.TRANSITION_LOCK_MS);
+  }
+
   goToSection(index, smoothTransition = true) {
     if (index < 0 || index >= this.totalSections) return;
 
@@ -147,6 +159,16 @@ class PortfolioNavigator {
     this.elements.navItems.forEach((item, idx) => {
       item.classList.toggle("active", idx === this.state.currentSection);
     });
+
+    const activeItem = this.elements.navItems[this.state.currentSection];
+    if (activeItem && this.elements.navIndicator) {
+      const indicator = this.elements.navIndicator;
+      const isFirstPlacement = !indicator.style.left;
+      if (isFirstPlacement) indicator.style.transition = "none";
+      indicator.style.left = `${activeItem.offsetLeft}px`;
+      indicator.style.width = `${activeItem.offsetWidth}px`;
+      if (isFirstPlacement) requestAnimationFrame(() => { indicator.style.transition = ""; });
+    }
 
     this.elements.sections.forEach((sec, i) => {
       sec.classList.toggle("active", i === this.state.currentSection);
@@ -246,9 +268,10 @@ class PortfolioNavigator {
     this.state.initialTransform = this.getTransformX();
 
     if (this.elements.sectionsContainer) {
-      this.elements.sectionsContainer.style.cursor = "grabbing";
       this.elements.sectionsContainer.classList.add("no-transition");
     }
+
+    document.querySelector(".cursor")?.classList.add("is-dragging");
   }
 
   updateDrag(clientX) {
@@ -270,9 +293,10 @@ class PortfolioNavigator {
     this.state.isDragging = false;
 
     if (this.elements.sectionsContainer) {
-      this.elements.sectionsContainer.style.cursor = "grab";
       this.elements.sectionsContainer.classList.remove("no-transition");
     }
+
+    document.querySelector(".cursor")?.classList.remove("is-dragging");
 
     const deltaX = this.state.currentX - this.state.startX;
     const threshold = window.innerWidth * NAVIGATION_CONFIG.DRAG_THRESHOLD;
@@ -298,9 +322,12 @@ class PortfolioNavigator {
     if (this.isMobilePortrait()) return;
     e.preventDefault();
 
+    if (this.isTransitioning) return;
+
     const delta = e.deltaX || e.deltaY;
 
     if (Math.abs(delta) > NAVIGATION_CONFIG.WHEEL_THRESHOLD) {
+      this.startTransition();
       delta > 0 ? this.nextSection() : this.previousSection();
     }
   }
@@ -310,12 +337,18 @@ class PortfolioNavigator {
       case "ArrowLeft":
       case "ArrowUp":
         e.preventDefault();
-        this.previousSection();
+        if (!this.isTransitioning) {
+          this.startTransition();
+          this.previousSection();
+        }
         break;
       case "ArrowRight":
       case "ArrowDown":
         e.preventDefault();
-        this.nextSection();
+        if (!this.isTransitioning) {
+          this.startTransition();
+          this.nextSection();
+        }
         break;
       default:
         const num = parseInt(e.key);
@@ -520,6 +553,77 @@ class PortfolioNavigator {
     );
   }
 
+  // Theme toggle: cross-fade via View Transitions API.
+  // The browser snapshots before/after and crossfades between them.
+  // Fallback for browsers without View Transitions: instant swap.
+  initTheme() {
+    const toggle = document.getElementById("themeToggle");
+    if (!toggle) return;
+
+    toggle.addEventListener("click", () => {
+      const root = document.documentElement;
+      const current = root.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+
+      const applyTheme = () => {
+        root.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+      };
+
+      // Fallback: no View Transitions support or user prefers reduced motion
+      if (
+        !document.startViewTransition ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        applyTheme();
+        return;
+      }
+
+      document.startViewTransition(applyTheme);
+    });
+  }
+
+  // Custom cursor tracking (fine-pointer / mouse only)
+  initCursor() {
+    const cursor = document.querySelector(".cursor");
+    if (!cursor || !window.matchMedia("(pointer: fine)").matches) return;
+
+    let rafPending = false;
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+
+    document.addEventListener("mousemove", (e) => {
+      x = e.clientX;
+      y = e.clientY;
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => {
+          cursor.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%))`;
+          rafPending = false;
+        });
+      }
+    });
+
+    document.addEventListener("mouseleave", () => {
+      cursor.style.opacity = "0";
+    });
+    document.addEventListener("mouseenter", () => {
+      cursor.style.opacity = "1";
+    });
+
+    const hoverTargets = document.querySelectorAll(
+      "a, button, [role='button'], .nav-item, .scroll-dot, .scroll-menu-item"
+    );
+    hoverTargets.forEach((el) => {
+      el.addEventListener("mouseenter", () =>
+        cursor.classList.add("is-hovering")
+      );
+      el.addEventListener("mouseleave", () =>
+        cursor.classList.remove("is-hovering")
+      );
+    });
+  }
+
   // Initialization
   init() {
     const hash = location.hash.slice(1);
@@ -527,6 +631,8 @@ class PortfolioNavigator {
 
     this.state.currentSection = idx !== -1 ? idx : 0;
     this.setupEventListeners();
+    this.initTheme();
+    this.initCursor();
 
     // Initialize after a brief delay to ensure DOM readiness
     setTimeout(() => {
