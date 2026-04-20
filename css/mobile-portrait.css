@@ -41,14 +41,6 @@
     max-width: 340px;
   }
 
-  .mobile-section[data-index="1"] {
-    align-items: stretch;
-  }
-
-  .mobile-section[data-index="1"] .mobile-content {
-    max-width: none;
-  }
-
   .mobile-eyebrow {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
@@ -146,18 +138,6 @@
     font-weight: 300;
     color: var(--ink-2);
     line-height: 1.72;
-  }
-
-  /* ── Mobile about with particle portrait ───────── */
-  .mobile-about-content {
-    gap: var(--sp-3);
-    height: 100%;
-  }
-
-  .mobile-particle-portrait {
-    width: 100%;
-    flex: 1;
-    min-height: 0;
   }
 
   .mobile-wip {
