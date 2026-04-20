@@ -265,15 +265,59 @@ body {
 
 /* ── Particle Portrait ──────────────────────────── */
 .particle-portrait-container {
-  overflow: hidden;
+  overflow: visible;
   line-height: 0;
+  position: relative;
+  padding: 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Thin border frame */
+.particle-portrait-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--line);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Corner ticks — drawn with a box-shadow trick for all 4 corners */
+.particle-portrait-container::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  pointer-events: none;
+  z-index: 2;
+  /* Top-left corner tick */
+  background:
+    /* top-left horizontal */
+    linear-gradient(var(--cosmic-orange), var(--cosmic-orange)) 0 0 / 16px 1px no-repeat,
+    /* top-left vertical */
+    linear-gradient(var(--cosmic-orange), var(--cosmic-orange)) 0 0 / 1px 16px no-repeat,
+    /* top-right horizontal */
+    linear-gradient(var(--cosmic-orange), var(--cosmic-orange)) 100% 0 / 16px 1px no-repeat,
+    /* top-right vertical */
+    linear-gradient(var(--cosmic-orange), var(--cosmic-orange)) 100% 0 / 1px 16px no-repeat,
+    /* bottom-left horizontal */
+    linear-gradient(var(--cosmic-orange), var(--cosmic-orange)) 0 100% / 16px 1px no-repeat,
+    /* bottom-left vertical */
+    linear-gradient(var(--cosmic-orange), var(--cosmic-orange)) 0 100% / 1px 16px no-repeat,
+    /* bottom-right horizontal */
+    linear-gradient(var(--cosmic-orange), var(--cosmic-orange)) 100% 100% / 16px 1px no-repeat,
+    /* bottom-right vertical */
+    linear-gradient(var(--cosmic-orange), var(--cosmic-orange)) 100% 100% / 1px 16px no-repeat;
 }
 
 .particle-portrait-canvas {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
+  height: auto;
+  position: relative;
 }
 
 @media (prefers-reduced-motion: reduce) {
