@@ -614,6 +614,7 @@ class PortfolioNavigator {
       cursor.style.opacity = "1";
     });
 
+
     const hoverTargets = document.querySelectorAll(
       "a, button, [role='button'], .nav-item, .scroll-dot, .scroll-menu-item",
     );
