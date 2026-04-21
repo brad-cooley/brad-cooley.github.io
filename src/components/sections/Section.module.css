@@ -35,7 +35,7 @@
     padding: calc(var(--safe-top) + 18vh) calc(var(--safe-right) + var(--sp-6))
       calc(var(--safe-bottom) + var(--sp-12)) calc(var(--safe-left) + var(--sp-6));
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+    scroll-snap-stop: normal;
   }
   /* Ghost numeral kept on mobile — smaller and tucked bottom-right */
   .ghostNum {

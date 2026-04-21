@@ -2,9 +2,9 @@
   position: fixed;
   inset: 0;
   z-index: 1100;
-  background: rgba(0, 0, 0, 0.32);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: none;
   padding: 0;
   cursor: pointer;
@@ -12,18 +12,21 @@
 
 .sheet {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  /* Anchor near the pill so the morph origin makes visual sense */
+  top: calc(var(--safe-top) + var(--sp-2));
+  left: var(--sp-3);
+  right: var(--sp-3);
   z-index: 1101;
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
-  border-bottom-left-radius: 18px;
-  border-bottom-right-radius: 18px;
-  padding-top: calc(var(--safe-top) + var(--sp-3));
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
   padding-bottom: var(--sp-4);
-  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  transform-origin: top center;
   touch-action: none;
+  overflow: hidden;
 }
 
 .handleBar {

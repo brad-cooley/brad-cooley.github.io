@@ -5,11 +5,14 @@
   width: 100vw;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-snap-type: y mandatory;
+  /* Proximity (not mandatory) — softer snap, lets user free-scroll
+     between sections without the browser yanking them into place. */
+  scroll-snap-type: y proximity;
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: none;
   scrollbar-width: none;
   overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
 }
 
 .layout::-webkit-scrollbar {

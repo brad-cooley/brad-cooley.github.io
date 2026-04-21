@@ -45,8 +45,12 @@
     width: 100%;
     max-width: 340px;
     gap: var(--sp-5);
+    justify-items: start;
   }
   .portraitCol {
     display: none;
+  }
+  .textCol {
+    width: 100%;
   }
 }

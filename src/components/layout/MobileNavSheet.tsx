@@ -9,12 +9,14 @@ interface Props {
   onClose: () => void;
 }
 
-const SHEET_SPRING = { type: "spring" as const, stiffness: 380, damping: 36, mass: 0.9 };
-const FADE = { duration: 0.18 };
+// Morph-in spring — feels like an iOS menu blooming from the pill.
+const SHEET_SPRING = { type: "spring" as const, stiffness: 420, damping: 32, mass: 0.7 };
+const FADE = { duration: 0.22, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] };
 
 /**
- * Mobile nav sheet — slides down from the top with the section list.
- * Drag the sheet up to dismiss; tap the backdrop to close.
+ * Mobile nav sheet — morphs out of the top pill (origin top-center)
+ * with a scale + opacity spring, mimicking iOS Control-Center expand.
+ * Drag up to dismiss; tap backdrop to close.
  */
 export default function MobileNavSheet({ open, activeIndex, onSelect, onClose }: Props) {
   const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -40,9 +42,9 @@ export default function MobileNavSheet({ open, activeIndex, onSelect, onClose }:
             role="dialog"
             aria-label="Sections"
             aria-modal="true"
-            initial={{ y: "-100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "-100%" }}
+            initial={{ opacity: 0, scale: 0.86, y: -12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: -8, transition: { duration: 0.18 } }}
             transition={SHEET_SPRING}
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
@@ -56,7 +58,13 @@ export default function MobileNavSheet({ open, activeIndex, onSelect, onClose }:
               {SECTIONS.map((s, i) => {
                 const active = i === activeIndex;
                 return (
-                  <li key={s.id} role="none">
+                  <motion.li
+                    key={s.id}
+                    role="none"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.06 + i * 0.035, duration: 0.28, ease: "easeOut" }}
+                  >
                     <button
                       type="button"
                       role="menuitem"
@@ -70,7 +78,7 @@ export default function MobileNavSheet({ open, activeIndex, onSelect, onClose }:
                       <span className={styles.label}>{s.label}</span>
                       {active && <span className={styles.dot} aria-hidden="true" />}
                     </button>
-                  </li>
+                  </motion.li>
                 );
               })}
             </ul>
