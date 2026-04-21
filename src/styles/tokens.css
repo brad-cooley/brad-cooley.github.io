@@ -54,6 +54,32 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Liquid-glass surface (iOS-style frosted bubble). Light theme default. */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  --glass-shadow:
+    0 6px 24px -8px rgba(0, 0, 0, 0.18), 0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
+    0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  --glass-blur: saturate(180%) blur(22px);
+}
+
+[data-theme="dark"] {
+  --glass-bg: rgba(26, 26, 24, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow:
+    0 6px 24px -8px rgba(0, 0, 0, 0.5), 0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 0 0 0.5px rgba(255, 255, 255, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --glass-bg: rgba(26, 26, 24, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow:
+      0 6px 24px -8px rgba(0, 0, 0, 0.5), 0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+      0 0 0 0.5px rgba(255, 255, 255, 0.04);
+  }
 }
 
 /* Mobile: prefer system fonts for body text — feels native, removes

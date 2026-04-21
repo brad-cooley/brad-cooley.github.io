@@ -37,7 +37,10 @@
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
+  /* Ghost numeral kept on mobile — smaller and tucked bottom-right */
   .ghostNum {
-    display: none;
+    font-size: clamp(8rem, 38vw, 16rem);
+    bottom: calc(var(--safe-bottom) + var(--sp-4));
+    right: var(--sp-4);
   }
 }
