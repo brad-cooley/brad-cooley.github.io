@@ -12,21 +12,17 @@
 
 .sheet {
   position: fixed;
-  /* Anchor near the pill so the morph origin makes visual sense */
+  /* Anchor near the pill so the morph reads as expansion from it */
   top: calc(var(--safe-top) + var(--sp-2));
   left: var(--sp-3);
   right: var(--sp-3);
   z-index: 1101;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding-bottom: var(--sp-4);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  transform-origin: top center;
+  border-radius: 28px;
   touch-action: none;
-  overflow: hidden;
+}
+
+.sheetInner {
+  padding-bottom: var(--sp-4);
 }
 
 .handleBar {

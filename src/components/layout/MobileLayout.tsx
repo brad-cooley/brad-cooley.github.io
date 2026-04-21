@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import LiquidGlass from "liquid-glass-react";
 import { SECTIONS } from "../../data/sections";
 import MobileNavSheet from "./MobileNavSheet";
 import ThemeToggle from "./ThemeToggle";
@@ -9,10 +11,13 @@ interface Props {
   onSelect: (next: number) => void;
 }
 
+// Shared spring across pill <-> sheet morph. Snappy but liquid.
+const MORPH_SPRING = { type: "spring" as const, stiffness: 380, damping: 34, mass: 0.8 };
+
 /**
  * Mobile portrait layout. Native CSS scroll-snap drives section
- * snapping (smooth, no jank). Programmatic nav uses native smooth
- * scroll. Tap the top pill to open the nav sheet.
+ * snapping. The top pill morphs (via Framer Motion `layoutId`) into
+ * the nav sheet, with `liquid-glass-react` providing the surface.
  */
 export default function MobileLayout({ index, onSelect }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -20,7 +25,6 @@ export default function MobileLayout({ index, onSelect }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const isProgrammaticRef = useRef(false);
 
-  // Programmatic scroll to current index — native smooth.
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
@@ -34,7 +38,6 @@ export default function MobileLayout({ index, onSelect }: Props) {
     return () => window.clearTimeout(t);
   }, [index]);
 
-  // IntersectionObserver to track active section as user swipes.
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
@@ -71,20 +74,42 @@ export default function MobileLayout({ index, onSelect }: Props) {
         })}
       </div>
 
-      {/* Centered top pill — liquid-glass nav handle */}
+      {/* Pill <-> sheet morph. Pill hides while sheet is open so the
+          shared `layoutId` can animate between their bounding boxes. */}
       <div className={styles.pillWrap}>
-        <button
-          type="button"
-          className={styles.pill}
-          aria-label={`Open navigation. Current section: ${current?.label ?? ""}`}
-          onClick={() => setMenuOpen(true)}
-        >
-          <span className={styles.pillGrip} aria-hidden="true" />
-          <span className={styles.pillLabel}>
-            <span className={styles.pillNum}>{current?.num}</span>
-            <span>{current?.label}</span>
-          </span>
-        </button>
+        <AnimatePresence>
+          {!menuOpen && (
+            <motion.button
+              key="nav-pill"
+              type="button"
+              layoutId="navSurface"
+              className={styles.pill}
+              aria-label={`Open navigation. Current section: ${current?.label ?? ""}`}
+              onClick={() => setMenuOpen(true)}
+              transition={MORPH_SPRING}
+              whileTap={{ scale: 0.96 }}
+            >
+              <LiquidGlass
+                cornerRadius={999}
+                padding="7px 16px 9px"
+                displacementScale={28}
+                blurAmount={0.08}
+                saturation={150}
+                aberrationIntensity={1}
+                elasticity={0.2}
+                mode="standard"
+              >
+                <span className={styles.pillInner}>
+                  <span className={styles.pillGrip} aria-hidden="true" />
+                  <span className={styles.pillLabel}>
+                    <span className={styles.pillNum}>{current?.num}</span>
+                    <span>{current?.label}</span>
+                  </span>
+                </span>
+              </LiquidGlass>
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
       <MobileNavSheet
@@ -92,6 +117,7 @@ export default function MobileLayout({ index, onSelect }: Props) {
         activeIndex={index}
         onSelect={onSelect}
         onClose={() => setMenuOpen(false)}
+        morphSpring={MORPH_SPRING}
       />
 
       <ThemeToggle />
