@@ -1,0 +1,108 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.sheet {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1101;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  padding-top: calc(var(--safe-top) + var(--sp-3));
+  padding-bottom: var(--sp-4);
+  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.35);
+  touch-action: none;
+}
+
+.handleBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--sp-2) 0 var(--sp-3);
+}
+
+.grip {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ink-3);
+  opacity: 0.7;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  padding: var(--sp-4) var(--sp-4);
+  background: none;
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--t-fast),
+    color var(--t-fast);
+}
+
+.item:active {
+  background: var(--accent-sub);
+}
+
+.item.active {
+  color: var(--ink);
+  background: var(--cosmic-orange-sub, rgba(240, 114, 24, 0.08));
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  flex-shrink: 0;
+  width: 24px;
+}
+
+.item.active .num {
+  color: var(--cosmic-orange);
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cosmic-orange);
+  flex-shrink: 0;
+}

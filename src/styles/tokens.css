@@ -1,0 +1,112 @@
+/* Design tokens — single source of truth for theming. */
+
+:root {
+  --bg: #f8f7f4;
+  --bg-raised: #ffffff;
+  --ink: #141412;
+  --ink-2: #6b6a67;
+  --ink-3: #b4b2ae;
+  --line: #e5e3df;
+  --accent: #1246f0;
+  --accent-sub: rgba(18, 70, 240, 0.06);
+  --cosmic-orange: #f07218;
+  --cosmic-orange-deep: #bf4800;
+  --section-title-color: var(--cosmic-orange);
+
+  --font-display: "Syne", sans-serif;
+  --font-body: "DM Sans Variable", "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", monospace;
+
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 4rem;
+  --text-hero: clamp(4.5rem, 10vw, 10rem);
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+  --sp-24: 96px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 120ms;
+  --t-base: 280ms;
+  --t-slow: 500ms;
+  --t-enter: 700ms;
+  --t-section: 600ms;
+
+  /* Safe-area insets — fallback to 0 on browsers without env() support */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+/* Mobile: prefer system fonts for body text — feels native, removes
+   font-load jank, keeps Syne for display headings. */
+@media (max-width: 767px) {
+  :root {
+    --font-body:
+      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
+  }
+}
+
+[data-theme="light"] {
+  --bg: #f8f7f4;
+  --bg-raised: #ffffff;
+  --ink: #141412;
+  --ink-2: #6b6a67;
+  --ink-3: #b4b2ae;
+  --line: #e5e3df;
+  --accent: #1246f0;
+  --accent-sub: rgba(18, 70, 240, 0.06);
+  --cosmic-orange: #f07218;
+  --cosmic-orange-deep: #bf4800;
+  --cosmic-orange-sub: rgba(240, 114, 24, 0.08);
+  --section-title-color: var(--cosmic-orange);
+}
+
+[data-theme="dark"] {
+  --bg: #0f0f0e;
+  --bg-raised: #1a1a18;
+  --ink: #f0efe9;
+  --ink-2: #8a8883;
+  --ink-3: #555350;
+  --line: #2d2c2a;
+  --accent: #4f7bf7;
+  --accent-sub: rgba(79, 123, 247, 0.08);
+  --cosmic-orange: #cc6420;
+  --cosmic-orange-deep: #a04200;
+  --cosmic-orange-sub: rgba(204, 100, 32, 0.1);
+  --section-title-color: var(--cosmic-orange-deep);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #0f0f0e;
+    --bg-raised: #1a1a18;
+    --ink: #f0efe9;
+    --ink-2: #8a8883;
+    --ink-3: #555350;
+    --line: #2d2c2a;
+    --accent: #4f7bf7;
+    --accent-sub: rgba(79, 123, 247, 0.08);
+    --cosmic-orange: #cc6420;
+    --cosmic-orange-deep: #a04200;
+    --cosmic-orange-sub: rgba(204, 100, 32, 0.1);
+  }
+}

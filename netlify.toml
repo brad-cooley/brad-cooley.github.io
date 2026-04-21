@@ -1,0 +1,13 @@
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback — HashRouter handles client-side routes, but this
+# protects against any deep link landing on the wrong path.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

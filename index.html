@@ -2,412 +2,53 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Brad Cooley — Lead Senior Data Engineer</title>
 
-    <!-- Fonts: Syne · DM Sans · JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400&display=swap"
-      rel="stylesheet"
+    <meta
+      name="description"
+      content="Brad Cooley — Lead Data Engineer at Mutually Human, based in Grand Rapids, MI. Building elegant, durable solutions to complex problems."
     />
+    <meta name="theme-color" content="#f8f7f4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0f0e" media="(prefers-color-scheme: dark)" />
 
-    <link rel="stylesheet" href="css/base.css" />
-    <link rel="stylesheet" href="css/desktop.css" />
-    <link rel="stylesheet" href="css/mobile-portrait.css" />
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Brad Cooley — Lead Senior Data Engineer" />
+    <meta
+      property="og:description"
+      content="Personal portfolio of Brad Cooley, Lead Data Engineer at Mutually Human."
+    />
+    <meta property="og:url" content="https://brad.cooley.dev" />
+    <meta property="og:image" content="https://brad.cooley.dev/assets/img/headshot.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Brad Cooley — Lead Senior Data Engineer" />
+    <meta
+      name="twitter:description"
+      content="Personal portfolio of Brad Cooley, Lead Data Engineer at Mutually Human."
+    />
+    <meta name="twitter:image" content="https://brad.cooley.dev/assets/img/headshot.png" />
+
+    <link rel="canonical" href="https://brad.cooley.dev/" />
+
     <!-- Set theme before paint to prevent flash -->
     <script>
       (function () {
-        var s = localStorage.getItem("theme");
-        var d = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        document.documentElement.setAttribute(
-          "data-theme",
-          s || (d ? "dark" : "light"),
-        );
+        try {
+          var s = localStorage.getItem("theme");
+          var d = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.setAttribute("data-theme", s || (d ? "dark" : "light"));
+        } catch (_) {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
       })();
     </script>
   </head>
   <body>
-    <!-- Custom cursor (fine-pointer / mouse only) -->
-    <div class="cursor" aria-hidden="true"></div>
-
-    <!-- Grain texture overlay -->
-    <div class="grain" aria-hidden="true"></div>
-
-    <!-- Theme toggle — unique half-circle icon -->
-    <button
-      class="theme-toggle"
-      id="themeToggle"
-      aria-label="Toggle color mode"
-    >
-      <span class="theme-toggle-icon" aria-hidden="true"></span>
-    </button>
-
-    <div class="app-container">
-      <!-- ════════════════════════════════════════════════
-           DESKTOP LAYOUT  ≥ 768px
-           ════════════════════════════════════════════════ -->
-      <div class="desktop-layout">
-        <div class="sections-container">
-          <!-- 01 · Home ─────────────────────────────── -->
-          <section class="section home-section active">
-            <div class="section-ghost-num" aria-hidden="true">01</div>
-            <div class="home-content">
-              <div class="home-name">
-                <h1>Brad<br />Cooley</h1>
-              </div>
-              <div class="home-rule"></div>
-              <div class="home-footer">
-                <p class="home-title">Lead Data Engineer @ Mutually Human</p>
-                <div class="home-links">
-                  <a
-                    href="https://github.com/brad-cooley"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="GitHub Profile"
-                    >GitHub<span class="link-arrow">↗</span></a
-                  >
-                  <a
-                    href="https://linkedin.com/in/bradcooley"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="LinkedIn Profile"
-                    >LinkedIn<span class="link-arrow">↗</span></a
-                  >
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- 02 · About ─────────────────────────────── -->
-          <section class="section about-section" data-section="about">
-            <div class="section-ghost-num" aria-hidden="true">02</div>
-            <div class="about-layout">
-              <div class="about-portrait-col">
-                <div
-                  class="particle-portrait-container"
-                  data-particle-portrait="assets/img/headshot.png"
-                  data-particle-gap="3"
-                  data-particle-size="1.2"
-                ></div>
-              </div>
-              <div class="about-text-col">
-                <span class="section-eyebrow">02 — About</span>
-                <h2 class="section-title">Who<br />I am.</h2>
-                <p class="section-body-text">
-                  A passionate data engineer creating elegant solutions to
-                  complex problems, with an eye for the details that make them
-                  last. I design for the business and the people who use it,
-                  always leading with empathy.
-                </p>
-                <p class="section-body-text">
-                  Based in Grand Rapids, Michigan, but constantly exploring the
-                  world through code and travel. I'm always tinkering, learning,
-                  and building new things.
-                </p>
-                <span class="section-wip"
-                  >Want to talk?
-                  <a href="mailto:brad@cooley.email"
-                    >Email me<span class="link-arrow">↗</span></a
-                  >.</span
-                >
-              </div>
-            </div>
-          </section>
-
-          <!-- 03 · Projects ──────────────────────────── -->
-          <section class="section" data-section="projects">
-            <div class="section-ghost-num" aria-hidden="true">03</div>
-            <div class="section-inner">
-              <div class="section-label-col">
-                <span class="section-eyebrow">03 — Projects</span>
-                <h2 class="section-title">What<br />I&nbsp;build.</h2>
-              </div>
-              <div class="section-text-col">
-                <p class="section-body-text">
-                  A selection of work spanning web applications, data
-                  engineering, and open-source contributions. Each project
-                  represents a journey of learning and craft.
-                </p>
-                <span class="section-wip">— Showcase launching soon</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- 04 · Writing ───────────────────────────── -->
-          <section class="section" data-section="blog">
-            <div class="section-ghost-num" aria-hidden="true">04</div>
-            <div class="section-inner">
-              <div class="section-label-col">
-                <span class="section-eyebrow">04 — Writing</span>
-                <h2 class="section-title">How<br />I&nbsp;think.</h2>
-              </div>
-              <div class="section-text-col">
-                <p class="section-body-text">
-                  Thoughts on technology, development practices, and the craft
-                  of building software. A documentation of my learning journey.
-                </p>
-                <span class="section-wip">— First posts arriving soon</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- 05 · Resume ────────────────────────────── -->
-          <section class="section" data-section="resume">
-            <div class="section-ghost-num" aria-hidden="true">05</div>
-            <div class="section-inner">
-              <div class="section-label-col">
-                <span class="section-eyebrow">05 — Resume</span>
-                <h2 class="section-title">What<br />I've done.</h2>
-              </div>
-              <div class="section-text-col">
-                <p class="section-body-text">
-                  Professional background, technical skills, and experience. A
-                  comprehensive look at my career journey as a software and data
-                  engineer.
-                </p>
-                <span class="section-wip">— Full resume arriving soon</span>
-              </div>
-            </div>
-          </section>
-        </div>
-        <!-- /sections-container -->
-
-        <!-- Navigation ─────────────────────────────── -->
-        <nav class="bottom-nav" aria-label="Site navigation">
-          <div class="nav-container" data-nav-container>
-            <div class="nav-indicator" aria-hidden="true"></div>
-            <div
-              class="nav-item active"
-              data-section="0"
-              role="button"
-              tabindex="0"
-              aria-label="Home"
-            >
-              <span class="nav-num">01</span>
-              <span class="nav-label">Home</span>
-            </div>
-            <div
-              class="nav-item"
-              data-section="1"
-              role="button"
-              tabindex="0"
-              aria-label="About"
-            >
-              <span class="nav-num">02</span>
-              <span class="nav-label">About</span>
-            </div>
-            <div
-              class="nav-item"
-              data-section="2"
-              role="button"
-              tabindex="0"
-              aria-label="Projects"
-            >
-              <span class="nav-num">03</span>
-              <span class="nav-label">Projects</span>
-            </div>
-            <div
-              class="nav-item"
-              data-section="3"
-              role="button"
-              tabindex="0"
-              aria-label="Writing"
-            >
-              <span class="nav-num">04</span>
-              <span class="nav-label">Writing</span>
-            </div>
-            <div
-              class="nav-item"
-              data-section="4"
-              role="button"
-              tabindex="0"
-              aria-label="Resume"
-            >
-              <span class="nav-num">05</span>
-              <span class="nav-label">Resume</span>
-            </div>
-          </div>
-        </nav>
-      </div>
-      <!-- /desktop-layout -->
-
-      <!-- ════════════════════════════════════════════════
-           MOBILE PORTRAIT LAYOUT  ≤ 767px portrait
-           ════════════════════════════════════════════════ -->
-      <div class="mobile-portrait-layout" id="mobilePortraitContainer">
-        <!-- 01 · Home -->
-        <div class="mobile-section home" data-index="0">
-          <div class="mobile-content">
-            <div class="mobile-eyebrow">01 / 05</div>
-            <h2 class="mobile-name">Brad<br />Cooley</h2>
-            <div class="mobile-rule"></div>
-            <p class="mobile-role">Lead Data Engineer @ Mutually Human</p>
-            <div class="mobile-links">
-              <a
-                href="https://github.com/brad-cooley"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub Profile"
-                >GitHub<span class="link-arrow">↗</span></a
-              >
-              <a
-                href="https://linkedin.com/in/bradcooley"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn Profile"
-                >LinkedIn<span class="link-arrow">↗</span></a
-              >
-            </div>
-          </div>
-        </div>
-
-        <!-- 02 · About -->
-        <div class="mobile-section" data-index="1">
-          <div class="mobile-content mobile-about-content">
-            <div class="mobile-eyebrow">02 / 05</div>
-            <h2 class="mobile-section-title">About</h2>
-            <div class="mobile-rule"></div>
-            <p class="mobile-body-text">
-              A passionate data engineer creating elegant solutions to complex
-              problems, with an eye for the details that make them last. I
-              design for the business and the people who use it, always leading
-              with empathy.
-            </p>
-            <p class="mobile-body-text">
-              Based in Grand Rapids, Michigan, but constantly exploring the
-              world through code and travel. I'm always tinkering, learning, and
-              building new things.
-            </p>
-            <span class="mobile-wip"
-              >Want to talk?
-              <a href="mailto:brad@cooley.email"
-                >Email me<span class="link-arrow">↗</span></a
-              >.</span
-            >
-          </div>
-        </div>
-
-        <!-- 03 · Projects -->
-        <div class="mobile-section" data-index="2">
-          <div class="mobile-content">
-            <div class="mobile-eyebrow">03 / 05</div>
-            <h2 class="mobile-section-title">Projects</h2>
-            <div class="mobile-rule"></div>
-            <p class="mobile-body-text">
-              A selection of work spanning web applications, data engineering,
-              and open-source contributions.
-            </p>
-            <span class="mobile-wip">— Showcase launching soon</span>
-          </div>
-        </div>
-
-        <!-- 04 · Writing -->
-        <div class="mobile-section" data-index="3">
-          <div class="mobile-content">
-            <div class="mobile-eyebrow">04 / 05</div>
-            <h2 class="mobile-section-title">Writing</h2>
-            <div class="mobile-rule"></div>
-            <p class="mobile-body-text">
-              Thoughts on technology, development practices, and the craft of
-              building software.
-            </p>
-            <span class="mobile-wip">— First posts arriving soon</span>
-          </div>
-        </div>
-
-        <!-- 05 · Resume -->
-        <div class="mobile-section" data-index="4">
-          <div class="mobile-content">
-            <div class="mobile-eyebrow">05 / 05</div>
-            <h2 class="mobile-section-title">Resume</h2>
-            <div class="mobile-rule"></div>
-            <p class="mobile-body-text">
-              Professional background, technical skills, and experience.
-            </p>
-            <span class="mobile-wip">— Full resume arriving soon</span>
-          </div>
-        </div>
-
-        <!-- Navigation dots -->
-        <div
-          class="scroll-indicator"
-          id="scrollIndicator"
-          aria-label="Navigate sections"
-        >
-          <div class="scroll-dot active" data-index="0"></div>
-          <div class="scroll-dot" data-index="1"></div>
-          <div class="scroll-dot" data-index="2"></div>
-          <div class="scroll-dot" data-index="3"></div>
-          <div class="scroll-dot" data-index="4"></div>
-        </div>
-
-        <!-- Slide-out menu -->
-        <nav
-          class="scroll-menu"
-          id="scrollMenu"
-          aria-label="Section navigation"
-        >
-          <div
-            class="scroll-menu-item active"
-            data-index="0"
-            role="button"
-            tabindex="0"
-          >
-            <span class="scroll-menu-num">01</span>
-            <span class="scroll-menu-label">Home</span>
-          </div>
-          <div
-            class="scroll-menu-item"
-            data-index="1"
-            role="button"
-            tabindex="0"
-          >
-            <span class="scroll-menu-num">02</span>
-            <span class="scroll-menu-label">About</span>
-          </div>
-          <div
-            class="scroll-menu-item"
-            data-index="2"
-            role="button"
-            tabindex="0"
-          >
-            <span class="scroll-menu-num">03</span>
-            <span class="scroll-menu-label">Projects</span>
-          </div>
-          <div
-            class="scroll-menu-item"
-            data-index="3"
-            role="button"
-            tabindex="0"
-          >
-            <span class="scroll-menu-num">04</span>
-            <span class="scroll-menu-label">Writing</span>
-          </div>
-          <div
-            class="scroll-menu-item"
-            data-index="4"
-            role="button"
-            tabindex="0"
-          >
-            <span class="scroll-menu-num">05</span>
-            <span class="scroll-menu-label">Resume</span>
-          </div>
-        </nav>
-
-        <div class="scroll-menu-backdrop" id="scrollMenuBackdrop"></div>
-
-        <div class="scroll-hint">
-          <div class="scroll-hint-line"></div>
-          <span>Scroll</span>
-        </div>
-      </div>
-      <!-- /mobile-portrait-layout -->
-    </div>
-    <!-- /app-container -->
-
-    <script src="js/particle-portrait.js"></script>
-    <script src="js/main.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

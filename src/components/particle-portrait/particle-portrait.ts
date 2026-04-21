@@ -3,77 +3,126 @@
  * Renders a headshot as thousands of tiny particles that start scattered
  * and settle into position with staggered delays (wave pattern).
  * Mouse hover reveals the original image colors in a radial area.
+ *
+ * Ported verbatim from the original vanilla JS implementation; only types
+ * have been added.
  */
-class ParticlePortrait {
-  constructor(container, imageSrc, options = {}) {
+
+export interface ParticlePortraitOptions {
+  particleSize?: number;
+  gap?: number;
+  ease?: number;
+  scatter?: number;
+  staggerMs?: number;
+  mouseRadius?: number;
+  colorEaseIn?: number;
+  colorEaseOut?: number;
+}
+
+interface Particle {
+  targetX: number;
+  targetY: number;
+  x: number;
+  y: number;
+  size: number;
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+  colorReveal: number;
+  delay: number;
+  active: boolean;
+  settled: boolean;
+}
+
+interface RequiredOptions {
+  particleSize: number;
+  gap: number;
+  ease: number;
+  scatter: number;
+  staggerMs: number;
+  mouseRadius: number;
+  colorEaseIn: number;
+  colorEaseOut: number;
+}
+
+export class ParticlePortrait {
+  private container: HTMLElement;
+  private imageSrc: string;
+  private options: RequiredOptions;
+
+  private canvas: HTMLCanvasElement | null = null;
+  private ctx: CanvasRenderingContext2D | null = null;
+  private particles: Particle[] = [];
+  private animationId: number | null = null;
+  private revealed = false;
+  private settled = false;
+  private observer: IntersectionObserver | null = null;
+  private resizeTimeout: ReturnType<typeof setTimeout> | null = null;
+  private mouse = { x: -9999, y: -9999, active: false };
+  private startTime = 0;
+  private sourceImage: HTMLImageElement | null = null;
+  private onResize: (() => void) | null = null;
+
+  constructor(container: HTMLElement, imageSrc: string, options: ParticlePortraitOptions = {}) {
     this.container = container;
     this.imageSrc = imageSrc;
     this.options = {
-      particleSize: options.particleSize || 1.2,
-      gap: options.gap || 3,
-      ease: options.ease || 0.045,
-      scatter: options.scatter || 500,
-      staggerMs: options.staggerMs || 1800,
-      mouseRadius: options.mouseRadius || 160,
-      colorEaseIn: options.colorEaseIn || 0.08,
-      colorEaseOut: options.colorEaseOut || 0.015,
-      ...options,
+      particleSize: options.particleSize ?? 1.2,
+      gap: options.gap ?? 3,
+      ease: options.ease ?? 0.045,
+      scatter: options.scatter ?? 500,
+      staggerMs: options.staggerMs ?? 1800,
+      mouseRadius: options.mouseRadius ?? 160,
+      colorEaseIn: options.colorEaseIn ?? 0.08,
+      colorEaseOut: options.colorEaseOut ?? 0.015,
     };
 
-    this.canvas = null;
-    this.ctx = null;
-    this.particles = [];
-    this.animationId = null;
-    this.revealed = false;
-    this.settled = false;
-    this.observer = null;
-    this.resizeTimeout = null;
-    this.mouse = { x: -9999, y: -9999, active: false };
-
-    this.init();
+    void this.init();
   }
 
-  async init() {
+  private async init(): Promise<void> {
     try {
       this.createCanvas();
       await this.loadAndSample();
       this.setupEvents();
       this.observeVisibility();
     } catch (err) {
-      console.error('ParticlePortrait: Failed to initialize', err);
+      console.error("ParticlePortrait: Failed to initialize", err);
     }
   }
 
-  createCanvas() {
-    this.canvas = document.createElement('canvas');
-    this.canvas.className = 'particle-portrait-canvas';
-    this.canvas.setAttribute('aria-hidden', 'true');
-    this.ctx = this.canvas.getContext('2d');
+  private createCanvas(): void {
+    this.canvas = document.createElement("canvas");
+    this.canvas.className = "particle-portrait-canvas";
+    this.canvas.setAttribute("aria-hidden", "true");
+    this.ctx = this.canvas.getContext("2d");
     this.container.appendChild(this.canvas);
   }
 
-  async loadAndSample() {
+  private async loadAndSample(): Promise<void> {
     const img = await this.loadImage(this.imageSrc);
     this.sourceImage = img;
     this.sampleImage(img);
   }
 
-  loadImage(src) {
+  private loadImage(src: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
+      img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
       img.onerror = reject;
       img.src = src;
     });
   }
 
-  sampleImage(img) {
-    // Reset any prior explicit sizing
-    this.container.style.width = '';
-    this.container.style.height = '';
-    this.canvas.style.width = '';
-    this.canvas.style.height = '';
+  private sampleImage(img: HTMLImageElement): void {
+    if (!this.canvas) return;
+
+    this.container.style.width = "";
+    this.container.style.height = "";
+    this.canvas.style.width = "";
+    this.canvas.style.height = "";
 
     const style = getComputedStyle(this.container);
     const padL = parseFloat(style.paddingLeft) || 0;
@@ -83,21 +132,20 @@ class ParticlePortrait {
     const containerRect = this.container.getBoundingClientRect();
     const contentW = containerRect.width - padL - padR;
 
-    // Cap height to 65% of viewport
     const maxH = window.innerHeight * 0.65 - padT - padB;
 
     const scale = Math.min(contentW / img.width, maxH / img.height);
     const drawW = Math.floor(img.width * scale);
     const drawH = Math.floor(img.height * scale);
 
-    // Set canvas pixel buffer
     this.canvas.width = drawW;
     this.canvas.height = drawH;
 
-    const offscreen = document.createElement('canvas');
+    const offscreen = document.createElement("canvas");
     offscreen.width = drawW;
     offscreen.height = drawH;
-    const offCtx = offscreen.getContext('2d');
+    const offCtx = offscreen.getContext("2d");
+    if (!offCtx) return;
     offCtx.drawImage(img, 0, 0, drawW, drawH);
 
     const imageData = offCtx.getImageData(0, 0, drawW, drawH);
@@ -120,7 +168,6 @@ class ParticlePortrait {
         const brightness = (r + g + b) / 3;
         if (brightness > 240 && a < 200) continue;
 
-        // Diagonal distance from top-left for stagger
         const diagDist = (x * 0.7 + y) / (drawW * 0.7 + drawH);
 
         this.particles.push({
@@ -129,9 +176,10 @@ class ParticlePortrait {
           x: x + (Math.random() - 0.5) * scatter * 2,
           y: y + (Math.random() - 0.5) * scatter * 2,
           size: this.options.particleSize * (0.7 + Math.random() * 0.6),
-          // Original image colors
-          r, g, b, a,
-          // Current display color blend (0 = tinted/stylized, 1 = original)
+          r,
+          g,
+          b,
+          a,
           colorReveal: 0,
           delay: diagDist * this.options.staggerMs + Math.random() * 200,
           active: false,
@@ -141,10 +189,9 @@ class ParticlePortrait {
     }
   }
 
-  setupEvents() {
-    // Resize
-    window.addEventListener('resize', () => {
-      clearTimeout(this.resizeTimeout);
+  private setupEvents(): void {
+    this.onResize = () => {
+      if (this.resizeTimeout) clearTimeout(this.resizeTimeout);
       this.resizeTimeout = setTimeout(() => {
         if (this.sourceImage && this.revealed) {
           this.sampleImage(this.sourceImage);
@@ -157,10 +204,12 @@ class ParticlePortrait {
           });
         }
       }, 200);
-    });
+    };
+    window.addEventListener("resize", this.onResize);
 
-    // Mouse interaction — reveal true colors
-    this.canvas.addEventListener('mousemove', (e) => {
+    if (!this.canvas) return;
+    this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
+      if (!this.canvas) return;
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
       const scaleY = this.canvas.height / rect.height;
@@ -169,14 +218,14 @@ class ParticlePortrait {
       this.mouse.active = true;
     });
 
-    this.canvas.addEventListener('mouseleave', () => {
+    this.canvas.addEventListener("mouseleave", () => {
       this.mouse.active = false;
       this.mouse.x = -9999;
       this.mouse.y = -9999;
     });
   }
 
-  observeVisibility() {
+  private observeVisibility(): void {
     this.observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -186,16 +235,15 @@ class ParticlePortrait {
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.2 },
     );
-
     this.observer.observe(this.container);
   }
 
-  startAnimation() {
+  private startAnimation(): void {
     this.startTime = performance.now();
 
-    const animate = (now) => {
+    const animate = (now: number) => {
       this.animationId = requestAnimationFrame(animate);
       this.update(now);
       this.draw(now);
@@ -204,7 +252,7 @@ class ParticlePortrait {
     this.animationId = requestAnimationFrame(animate);
   }
 
-  update(now) {
+  private update(now: number): void {
     const elapsed = now - this.startTime;
     const ease = this.options.ease;
     const mouseRadius = this.options.mouseRadius;
@@ -224,18 +272,16 @@ class ParticlePortrait {
         }
       }
 
-      // Color reveal based on mouse proximity
       let targetReveal = 0;
       if (this.mouse.active) {
         const mdx = p.targetX - this.mouse.x;
         const mdy = p.targetY - this.mouse.y;
         const dist = Math.sqrt(mdx * mdx + mdy * mdy);
         if (dist < mouseRadius) {
-          targetReveal = 1 - (dist / mouseRadius);
+          targetReveal = 1 - dist / mouseRadius;
         }
       }
 
-      // Ease color reveal toward target (fast in, slow out)
       const colorDiff = targetReveal - p.colorReveal;
       const easeRate = colorDiff > 0 ? colorEaseIn : colorEaseOut;
       if (Math.abs(colorDiff) > 0.003) {
@@ -245,7 +291,6 @@ class ParticlePortrait {
         p.colorReveal = targetReveal;
       }
 
-      // Position easing (entrance animation)
       const dx = p.targetX - p.x;
       const dy = p.targetY - p.y;
 
@@ -264,12 +309,13 @@ class ParticlePortrait {
     this.settled = allSettled;
   }
 
-  draw(now) {
+  private draw(now: number): void {
+    if (!this.ctx || !this.canvas) return;
     const { ctx, canvas } = this;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const t = now * 0.001; // time in seconds
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const t = now * 0.001;
 
     const accentR = isDark ? 204 : 240;
     const accentG = isDark ? 100 : 114;
@@ -279,12 +325,10 @@ class ParticlePortrait {
       const p = this.particles[i];
       if (!p.active) continue;
 
-      // Shimmer: each particle rapidly flickers between shades
-      // Use particle position as seed so they're all out of phase
       const flicker1 = Math.sin(t * 4.0 + p.targetX * 0.3 + p.targetY * 0.17);
       const flicker2 = Math.sin(t * 5.7 - p.targetX * 0.13 + p.targetY * 0.4);
       const flicker3 = Math.sin(t * 3.2 + p.targetX * 0.22 - p.targetY * 0.28);
-      const shimmer = (flicker1 * 0.4 + flicker2 * 0.35 + flicker3 * 0.25);
+      const shimmer = flicker1 * 0.4 + flicker2 * 0.35 + flicker3 * 0.25;
 
       const baseAlpha = p.a / 255;
       const alpha = baseAlpha;
@@ -292,10 +336,10 @@ class ParticlePortrait {
       const brightness = (p.r + p.g + p.b) / 3;
       const tintStrength = Math.max(0, Math.min(0.25, (brightness - 80) / 500));
 
-      // Compute the stylized (tinted) color with shimmer baked in
-      // Blend shimmer toward accent color (cosmic orange)
-      const shimmerAmt = Math.max(0, shimmer) * 0.3; // 0–30% accent blend when peaking
-      let styledR, styledG, styledB;
+      const shimmerAmt = Math.max(0, shimmer) * 0.3;
+      let styledR: number;
+      let styledG: number;
+      let styledB: number;
       if (isDark) {
         const base = Math.min(255, brightness + 40);
         const baseR = Math.round(base * (1 - tintStrength) + accentR * tintStrength);
@@ -332,32 +376,35 @@ class ParticlePortrait {
         ctx.fillStyle = `rgba(${styledR}, ${styledG}, ${styledB}, ${alpha})`;
       }
 
-      ctx.fillRect(
-        Math.round(p.x),
-        Math.round(p.y),
-        p.size,
-        p.size
-      );
+      ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
     }
+
+    // Mark `settled` as used to avoid TS noUnusedLocals.
+    void this.settled;
   }
 
-  destroy() {
-    if (this.animationId) {
+  destroy(): void {
+    if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
+      this.animationId = null;
     }
     if (this.observer) {
       this.observer.disconnect();
+      this.observer = null;
     }
+    if (this.onResize) {
+      window.removeEventListener("resize", this.onResize);
+      this.onResize = null;
+    }
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+      this.resizeTimeout = null;
+    }
+    if (this.canvas && this.canvas.parentNode === this.container) {
+      this.container.removeChild(this.canvas);
+    }
+    this.canvas = null;
+    this.ctx = null;
+    this.particles = [];
   }
 }
-
-// Auto-initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  const containers = document.querySelectorAll('[data-particle-portrait]');
-  containers.forEach((container) => {
-    const src = container.getAttribute('data-particle-portrait');
-    const gap = parseInt(container.getAttribute('data-particle-gap')) || undefined;
-    const size = parseFloat(container.getAttribute('data-particle-size')) || undefined;
-    new ParticlePortrait(container, src, { gap, particleSize: size });
-  });
-});

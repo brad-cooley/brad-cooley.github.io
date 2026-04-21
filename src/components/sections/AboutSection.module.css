@@ -1,0 +1,52 @@
+.layout {
+  width: min(1100px, 92%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(var(--sp-10), 5vw, var(--sp-20));
+  align-items: center;
+}
+
+.portraitCol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 70vh;
+}
+
+.portraitCol .portraitContainer {
+  width: 100%;
+}
+
+.textCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.textCol p {
+  max-width: 440px;
+}
+
+@media (min-width: 768px) and (max-width: 959px) {
+  .layout {
+    grid-template-columns: 1fr;
+    width: min(560px, 92%);
+    gap: var(--sp-8);
+    align-items: start;
+  }
+  .portraitCol {
+    max-height: 32vh;
+  }
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+  .layout {
+    grid-template-columns: 1fr;
+    width: 100%;
+    max-width: 340px;
+    gap: var(--sp-5);
+  }
+  .portraitCol {
+    display: none;
+  }
+}

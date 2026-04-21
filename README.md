@@ -1,108 +1,54 @@
-# Brad Cooley - Personal Portfolio
+# brad.cooley.dev
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A modern, responsive personal portfolio website built with HTML5, CSS3, and vanilla JavaScript.
+Personal portfolio site, deployed at **[brad.cooley.dev](https://brad.cooley.dev)**.
 
-## Features
+Built with **Vite + React 18 + TypeScript**, animated with **Framer Motion**,
+and managed with **[Bun](https://bun.sh)**.
 
-- **Responsive Design**: Works on all device sizes
-- **Modern UI**: Glassmorphism design with smooth animations
-- **Performance Optimized**: Fast loading and efficient code
-- **Accessible**: Built with web accessibility in mind
+## Stack
 
-## Project Structure
+- **Vite 5** — dev server & production bundler
+- **React 18** + **TypeScript**
+- **React Router 6** (`HashRouter` for static GitHub Pages hosting)
+- **Framer Motion** — drag, layout animations, view transitions
+- **CSS Modules** + a single `tokens.css` for design tokens
+- Self-hosted fonts via **`@fontsource`** (Syne, DM Sans, JetBrains Mono)
+
+## Project layout
 
 ```
 src/
-├── components/         # Reusable HTML components
-│   ├── sections/       # Section components
-│   ├── header.html     # Header component
-│   └── navigation.html # Navigation component
-├── js/
-│   ├── modules/       # JavaScript modules
-│   └── main.js         # Main JavaScript file
-├── styles/
-│   └── modules/      # CSS modules
-└── index.html          # Main HTML file
+├── App.tsx                    # Routes
+├── main.tsx                   # Entry, font + style imports
+├── data/sections.ts           # Single source of truth for sections
+├── hooks/                     # useTheme, useHashSection, useMediaQuery, …
+├── styles/                    # tokens.css + global.css
+└── components/
+    ├── layout/                # AppShell, Desktop/MobileLayout, Cursor, …
+    ├── sections/              # HomeSection, AboutSection, …
+    └── particle-portrait/     # Canvas particle effect + React wrapper
 ```
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- npm (v6 or higher)
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/brad-cooley/brad-cooley.github.io.git
-   cd brad-cooley.github.io
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### Development
-
-To start a local development server:
+## Scripts
 
 ```bash
-npm run dev
+bun install          # Install dependencies
+bun run dev          # Vite dev server (http://localhost:5173)
+bun run build        # Type-check + production build → dist/
+bun run preview      # Preview the production build
+bun run lint         # ESLint
+bun run format       # Prettier
 ```
 
-This will start a local server at `http://localhost:3000` with live reload.
+## Deployment
 
-### Building for Production
+`main` → **GitHub Pages** via `.github/workflows/deploy.yml` (Bun + Vite build,
+uploaded as a Pages artifact). The custom domain is preserved by `public/CNAME`.
 
-To create a production build:
-
-```bash
-npm run build
-```
-
-The built files will be in the `dist/` directory.
-
-### Deploying
-
-To deploy to GitHub Pages:
-
-1. Build the project:
-   ```bash
-   npm run build
-   ```
-
-2. Commit and push the `dist` directory to the `gh-pages` branch:
-   ```bash
-   git subtree push --prefix dist origin gh-pages
-   ```
-
-## Technologies Used
-
-- HTML5
-- CSS3 (with CSS Variables and Custom Properties)
-- JavaScript (ES6+)
-- PostCSS (for CSS processing)
-- npm (for package management)
-
-## Browser Support
-
-The website is tested and works on:
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
+In repository **Settings → Pages**, the source must be set to **GitHub Actions**.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- [Font Awesome](https://fontawesome.com/) for icons
-- [Google Fonts](https://fonts.google.com/) for typography
-- [PostCSS](https://postcss.org/) for CSS processing
+[MIT](./LICENSE).
