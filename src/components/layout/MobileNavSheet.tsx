@@ -1,5 +1,4 @@
 import { AnimatePresence, motion, type PanInfo, type Transition } from "framer-motion";
-import LiquidGlass from "liquid-glass-react";
 import { SECTIONS } from "../../data/sections";
 import styles from "./MobileNavSheet.module.css";
 
@@ -16,8 +15,7 @@ const FADE = { duration: 0.22, ease: [0.16, 1, 0.3, 1] as [number, number, numbe
 /**
  * Mobile nav sheet — morphs FROM the top pill via shared
  * `layoutId="navSurface"`. The pill (in MobileLayout) and this sheet
- * trade places, with Framer Motion animating bounds and
- * `liquid-glass-react` providing the surface.
+ * trade places, with Framer Motion animating bounds.
  */
 export default function MobileNavSheet({
   open,
@@ -58,53 +56,41 @@ export default function MobileNavSheet({
             dragElastic={{ top: 0.6, bottom: 0 }}
             onDragEnd={handleDragEnd}
           >
-            <LiquidGlass
-              cornerRadius={28}
-              displacementScale={48}
-              blurAmount={0.12}
-              saturation={150}
-              aberrationIntensity={1.5}
-              elasticity={0.18}
-              mode="standard"
-            >
-              <div className={styles.sheetInner}>
-                <div className={styles.handleBar} aria-hidden="true">
-                  <span className={styles.grip} />
-                </div>
-                <ul className={styles.list} role="menu">
-                  {SECTIONS.map((s, i) => {
-                    const active = i === activeIndex;
-                    return (
-                      <motion.li
-                        key={s.id}
-                        role="none"
-                        initial={{ opacity: 0, y: -6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          delay: 0.08 + i * 0.04,
-                          duration: 0.28,
-                          ease: "easeOut",
-                        }}
-                      >
-                        <button
-                          type="button"
-                          role="menuitem"
-                          className={`${styles.item} ${active ? styles.active : ""}`}
-                          onClick={() => {
-                            onSelect(i);
-                            onClose();
-                          }}
-                        >
-                          <span className={styles.num}>{s.num}</span>
-                          <span className={styles.label}>{s.label}</span>
-                          {active && <span className={styles.dot} aria-hidden="true" />}
-                        </button>
-                      </motion.li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </LiquidGlass>
+            <div className={styles.handleBar} aria-hidden="true">
+              <span className={styles.grip} />
+            </div>
+            <ul className={styles.list} role="menu">
+              {SECTIONS.map((s, i) => {
+                const active = i === activeIndex;
+                return (
+                  <motion.li
+                    key={s.id}
+                    role="none"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: 0.08 + i * 0.04,
+                      duration: 0.28,
+                      ease: "easeOut",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className={`${styles.item} ${active ? styles.active : ""}`}
+                      onClick={() => {
+                        onSelect(i);
+                        onClose();
+                      }}
+                    >
+                      <span className={styles.num}>{s.num}</span>
+                      <span className={styles.label}>{s.label}</span>
+                      {active && <span className={styles.dot} aria-hidden="true" />}
+                    </button>
+                  </motion.li>
+                );
+              })}
+            </ul>
           </motion.div>
         </>
       )}

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import LiquidGlass from "liquid-glass-react";
 import { SECTIONS } from "../../data/sections";
 import MobileNavSheet from "./MobileNavSheet";
 import ThemeToggle from "./ThemeToggle";
@@ -11,13 +10,14 @@ interface Props {
   onSelect: (next: number) => void;
 }
 
-// Shared spring across pill <-> sheet morph. Snappy but liquid.
+// Shared spring across pill <-> sheet morph.
 const MORPH_SPRING = { type: "spring" as const, stiffness: 380, damping: 34, mass: 0.8 };
 
 /**
  * Mobile portrait layout. Native CSS scroll-snap drives section
  * snapping. The top pill morphs (via Framer Motion `layoutId`) into
- * the nav sheet, with `liquid-glass-react` providing the surface.
+ * the nav sheet — Motion animates the bounding box transition while
+ * CSS handles the glass surface.
  */
 export default function MobileLayout({ index, onSelect }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -89,24 +89,11 @@ export default function MobileLayout({ index, onSelect }: Props) {
               transition={MORPH_SPRING}
               whileTap={{ scale: 0.96 }}
             >
-              <LiquidGlass
-                cornerRadius={999}
-                padding="7px 16px 9px"
-                displacementScale={28}
-                blurAmount={0.08}
-                saturation={150}
-                aberrationIntensity={1}
-                elasticity={0.2}
-                mode="standard"
-              >
-                <span className={styles.pillInner}>
-                  <span className={styles.pillGrip} aria-hidden="true" />
-                  <span className={styles.pillLabel}>
-                    <span className={styles.pillNum}>{current?.num}</span>
-                    <span>{current?.label}</span>
-                  </span>
-                </span>
-              </LiquidGlass>
+              <span className={styles.pillGrip} aria-hidden="true" />
+              <span className={styles.pillLabel}>
+                <span className={styles.pillNum}>{current?.num}</span>
+                <span>{current?.label}</span>
+              </span>
             </motion.button>
           )}
         </AnimatePresence>
