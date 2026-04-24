@@ -28,6 +28,26 @@ body {
   height: 100%;
 }
 
+/* Mobile portrait: let the document itself scroll so iOS Safari can
+   auto-collapse the URL bar / toolbar. Snap is on the root element. */
+@media (max-width: 767px) and (orientation: portrait) {
+  html {
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+  body {
+    overscroll-behavior-y: contain;
+  }
+}
+
 @media (pointer: fine) {
   * {
     cursor: none !important;

@@ -22,8 +22,10 @@
   border: 1.5px solid var(--ink-2);
   position: relative;
   overflow: hidden;
+  will-change: transform;
+  transform: rotate(0deg);
   transition:
-    rotate var(--t-slow) cubic-bezier(0.16, 1, 0.3, 1),
+    transform var(--t-slow) cubic-bezier(0.16, 1, 0.3, 1),
     border-color var(--t-base) var(--ease-out);
 }
 
@@ -39,7 +41,7 @@
 }
 
 :global([data-theme="dark"]) .icon {
-  rotate: 180deg;
+  transform: rotate(180deg);
 }
 
 .toggle:hover .icon {

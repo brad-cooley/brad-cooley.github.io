@@ -56,9 +56,6 @@ export default function MobileNavSheet({
             dragElastic={{ top: 0.6, bottom: 0 }}
             onDragEnd={handleDragEnd}
           >
-            <div className={styles.handleBar} aria-hidden="true">
-              <span className={styles.grip} />
-            </div>
             <ul className={styles.list} role="menu">
               {SECTIONS.map((s, i) => {
                 const active = i === activeIndex;

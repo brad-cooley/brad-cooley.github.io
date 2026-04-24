@@ -10,37 +10,34 @@ interface Props {
   onSelect: (next: number) => void;
 }
 
-// Shared spring across pill <-> sheet morph.
 const MORPH_SPRING = { type: "spring" as const, stiffness: 380, damping: 34, mass: 0.8 };
 
 /**
- * Mobile portrait layout. Native CSS scroll-snap drives section
- * snapping. The top pill morphs (via Framer Motion `layoutId`) into
- * the nav sheet — Motion animates the bounding box transition while
- * CSS handles the glass surface.
+ * Mobile portrait layout. Sections are laid out vertically and the
+ * DOCUMENT itself scrolls (not an inner container) so iOS Safari can
+ * auto-collapse its URL bar. Scroll-snap lives on `<html>`.
  */
 export default function MobileLayout({ index, onSelect }: Props) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const isProgrammaticRef = useRef(false);
 
+  // Programmatic scroll to current index — native smooth on the window.
   useEffect(() => {
-    const c = containerRef.current;
-    if (!c) return;
-    const target = index * c.clientHeight;
-    if (Math.abs(c.scrollTop - target) < 4) return;
+    const target = sectionRefs.current[index];
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY;
+    if (Math.abs(window.scrollY - top) < 4) return;
     isProgrammaticRef.current = true;
-    c.scrollTo({ top: target, behavior: "smooth" });
+    window.scrollTo({ top, behavior: "smooth" });
     const t = window.setTimeout(() => {
       isProgrammaticRef.current = false;
     }, 600);
     return () => window.clearTimeout(t);
   }, [index]);
 
+  // IntersectionObserver against the viewport (root: null).
   useEffect(() => {
-    const c = containerRef.current;
-    if (!c) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (isProgrammaticRef.current) return;
@@ -53,7 +50,7 @@ export default function MobileLayout({ index, onSelect }: Props) {
           if (i !== -1 && i !== index) onSelect(i);
         }
       },
-      { root: c, threshold: [0.55, 0.75, 1] },
+      { threshold: [0.55, 0.75, 1] },
     );
     sectionRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
@@ -63,7 +60,7 @@ export default function MobileLayout({ index, onSelect }: Props) {
 
   return (
     <>
-      <div ref={containerRef} className={styles.layout}>
+      <div className={styles.layout}>
         {SECTIONS.map((s, i) => {
           const Section = s.Component;
           return (
@@ -74,8 +71,7 @@ export default function MobileLayout({ index, onSelect }: Props) {
         })}
       </div>
 
-      {/* Pill <-> sheet morph. Pill hides while sheet is open so the
-          shared `layoutId` can animate between their bounding boxes. */}
+      {/* Pill <-> sheet morph via shared layoutId. */}
       <div className={styles.pillWrap}>
         <AnimatePresence>
           {!menuOpen && (
@@ -89,7 +85,6 @@ export default function MobileLayout({ index, onSelect }: Props) {
               transition={MORPH_SPRING}
               whileTap={{ scale: 0.96 }}
             >
-              <span className={styles.pillGrip} aria-hidden="true" />
               <span className={styles.pillLabel}>
                 <span className={styles.pillNum}>{current?.num}</span>
                 <span>{current?.label}</span>
