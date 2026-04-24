@@ -1,16 +1,16 @@
 .section {
-  width: 100vw;
-  height: 100%;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  flex-shrink: 0;
   position: relative;
   padding: var(--sp-10) clamp(var(--sp-10), 8vw, var(--sp-24));
+  overflow: hidden;
 }
 
-/* Ghost numeral flows freely between sections during slide transitions —
-   only the viewport (DesktopLayout) clips it. */
+/* Ghost numeral */
 .ghostNum {
   position: absolute;
   bottom: var(--sp-6);
@@ -28,16 +28,11 @@
 
 @media (max-width: 767px) and (orientation: portrait) {
   .section {
-    height: 100vh;
-    height: 100dvh;
     align-items: flex-start;
     justify-content: flex-start;
     padding: calc(var(--safe-top) + 18vh) calc(var(--safe-right) + var(--sp-6))
       calc(var(--safe-bottom) + var(--sp-12)) calc(var(--safe-left) + var(--sp-6));
-    scroll-snap-align: start;
-    scroll-snap-stop: normal;
   }
-  /* Ghost numeral kept on mobile — smaller and tucked bottom-right */
   .ghostNum {
     font-size: clamp(8rem, 38vw, 16rem);
     bottom: calc(var(--safe-bottom) + var(--sp-4));

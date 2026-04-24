@@ -1,21 +1,13 @@
-import { motion, motionValue, useTransform } from "framer-motion";
-import type { CSSProperties, ReactNode } from "react";
-import { useSliderMotion } from "./SliderMotionContext";
-
-// useTransform requires a MotionValue. Provide a stable dummy when
-// outside the slider so the hook signature stays consistent.
-const DUMMY_MV = motionValue(0);
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, type CSSProperties, type ReactNode } from "react";
 
 interface Props {
   /**
-   * Parallax rate. `0` = locked to section (no effect). `1` = moves at
-   * the same rate as the slider (i.e. fixed relative to viewport).
-   * Negative values move opposite the slide direction (good for
-   * "ghost" elements that drift the other way).
+   * Parallax rate. Positive values move the element slower than scroll
+   * (classic parallax). Negative values move it faster.
+   * 0 = no effect. 0.2 is a subtle float, 0.5 is dramatic.
    */
   rate: number;
-  /** Optional vertical parallax rate (rare; defaults to 0). */
-  rateY?: number;
   className?: string;
   style?: CSSProperties;
   children: ReactNode;
@@ -24,51 +16,44 @@ interface Props {
 }
 
 /**
- * Translates its children at a custom rate as the desktop slider
- * scrolls horizontally past this section. No-op outside the desktop
- * slider context (renders a plain div).
+ * Vertical scroll-linked parallax using Framer Motion's `useScroll`.
+ * Tracks the element's position in the viewport and applies a
+ * translateY offset proportional to `rate`.
+ *
+ * Works with Lenis smooth scroll (Lenis drives the actual scroll
+ * position, Motion reads it via scroll events).
  */
 export default function Parallax({
   rate,
-  rateY = 0,
   className,
   style,
   children,
   as = "div",
   "aria-hidden": ariaHidden,
 }: Props) {
-  const motionCtx = useSliderMotion();
+  const ref = useRef<HTMLDivElement>(null);
 
-  // Hooks must run unconditionally — compute even when ctx is null,
-  // then ignore the result if not inside the slider.
-  // We always pass a MotionValue; useTransform handles the math.
-  const x = useTransform(motionCtx?.x ?? DUMMY_MV, (latest) => {
-    if (!motionCtx) return 0;
-    // Distance (in px) between this section's "natural" track offset
-    // and the live offset. When current section, this is 0.
-    const sectionOffset = -motionCtx.sectionIndex * motionCtx.sectionWidth;
-    const delta = latest - sectionOffset;
-    return delta * rate;
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    // "start end" = element top hits viewport bottom (0)
+    // "end start" = element bottom hits viewport top (1)
+    offset: ["start end", "end start"],
   });
 
-  const y = useTransform(motionCtx?.x ?? DUMMY_MV, (latest) => {
-    if (!motionCtx || rateY === 0) return 0;
-    const sectionOffset = -motionCtx.sectionIndex * motionCtx.sectionWidth;
-    return (latest - sectionOffset) * rateY;
-  });
-
-  if (!motionCtx) {
-    const Tag = as;
-    return (
-      <Tag className={className} style={style} aria-hidden={ariaHidden}>
-        {children}
-      </Tag>
-    );
-  }
+  // Map scroll progress [0, 1] to a pixel offset.
+  // At progress=0.5 (element centered), offset=0.
+  // The multiplier controls intensity; 200 * rate gives a good range.
+  const y = useTransform(scrollYProgress, [0, 1], [rate * -150, rate * 150]);
 
   const Comp = as === "span" ? motion.span : motion.div;
+
   return (
-    <Comp className={className} style={{ ...style, x, y }} aria-hidden={ariaHidden}>
+    <Comp
+      ref={ref}
+      className={className}
+      style={{ ...style, y, willChange: "transform" }}
+      aria-hidden={ariaHidden}
+    >
       {children}
     </Comp>
   );
