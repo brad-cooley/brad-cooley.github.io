@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter } from "react-router-dom";
-import { ReactLenis } from "lenis/react";
 
 // Self-host fonts (drops Google Fonts CDN dependency)
 import "@fontsource/syne/700.css";
@@ -19,9 +18,7 @@ import App from "./App";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <HashRouter>
-      <ReactLenis root options={{ lerp: 0.1, duration: 1.2 }}>
-        <App />
-      </ReactLenis>
+      <App />
     </HashRouter>
   </StrictMode>,
 );

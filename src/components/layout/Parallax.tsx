@@ -1,11 +1,11 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
+import { useScrollOrientation } from "./ScrollOrientationContext";
 
 interface Props {
   /**
    * Parallax rate. Positive values move the element slower than scroll
-   * (classic parallax). Negative values move it faster.
-   * 0 = no effect. 0.2 is a subtle float, 0.5 is dramatic.
+   * (classic parallax). 0 = no effect.
    */
   rate: number;
   className?: string;
@@ -16,12 +16,9 @@ interface Props {
 }
 
 /**
- * Vertical scroll-linked parallax using Framer Motion's `useScroll`.
- * Tracks the element's position in the viewport and applies a
- * translateY offset proportional to `rate`.
- *
- * Works with Lenis smooth scroll (Lenis drives the actual scroll
- * position, Motion reads it via scroll events).
+ * Scroll-linked parallax using Framer Motion's `useScroll`.
+ * Reads orientation from context: horizontal on desktop, vertical on mobile.
+ * Applies translateX (horizontal) or translateY (vertical) offset.
  */
 export default function Parallax({
   rate,
@@ -32,28 +29,37 @@ export default function Parallax({
   "aria-hidden": ariaHidden,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const orientation = useScrollOrientation();
+  const isHorizontal = orientation === "horizontal";
 
-  const { scrollYProgress } = useScroll({
+  const { scrollXProgress, scrollYProgress } = useScroll({
     target: ref,
-    // "start end" = element top hits viewport bottom (0)
-    // "end start" = element bottom hits viewport top (1)
+    axis: isHorizontal ? "x" : "y",
     offset: ["start end", "end start"],
   });
 
+  const progress = isHorizontal ? scrollXProgress : scrollYProgress;
+
   // Map scroll progress [0, 1] to a pixel offset.
   // At progress=0.5 (element centered), offset=0.
-  // The multiplier controls intensity; 200 * rate gives a good range.
-  const y = useTransform(scrollYProgress, [0, 1], [rate * -150, rate * 150]);
+  const range = rate * 200;
+  const offset = useTransform(progress, [0, 1], [-range, range]);
 
   const Comp = as === "span" ? motion.span : motion.div;
 
+  const motionStyle: CSSProperties & Record<string, unknown> = {
+    ...style,
+    willChange: "transform",
+  };
+
+  if (isHorizontal) {
+    (motionStyle as Record<string, unknown>).x = offset;
+  } else {
+    (motionStyle as Record<string, unknown>).y = offset;
+  }
+
   return (
-    <Comp
-      ref={ref}
-      className={className}
-      style={{ ...style, y, willChange: "transform" }}
-      aria-hidden={ariaHidden}
-    >
+    <Comp ref={ref} className={className} style={motionStyle} aria-hidden={ariaHidden}>
       {children}
     </Comp>
   );

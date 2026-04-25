@@ -1,23 +1,17 @@
 .layout {
-  display: block;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
 }
 
-.viewport {
-  width: 100vw;
-  height: calc(100vh - 56px);
-  overflow: hidden;
-  position: relative;
-  touch-action: pan-y;
-}
-
 .track {
   display: flex;
-  width: 500vw;
   height: 100%;
   will-change: transform;
-  user-select: none;
-  cursor: none;
+}
+
+.panel {
+  flex-shrink: 0;
+  width: 100vw;
+  height: 100%;
 }

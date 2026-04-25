@@ -17,10 +17,18 @@ body {
   background: var(--bg);
   color: var(--ink);
   line-height: 1.6;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overscroll-behavior-y: contain;
+}
+
+/* Mobile: Lenis root mode needs document to scroll freely. */
+@media (max-width: 767px) and (orientation: portrait) {
+  body {
+    overflow: visible;
+  }
 }
 
 @media (pointer: fine) {
