@@ -6,7 +6,8 @@
 
 .track {
   display: flex;
-  height: 100%;
+  /* Leave room for the 56px BottomNav */
+  height: calc(100vh - 56px);
   will-change: transform;
 }
 

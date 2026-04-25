@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { ReactLenis, useLenis } from "lenis/react";
+import type Lenis from "lenis";
+import Snap from "lenis/snap";
 import { SECTIONS } from "../../data/sections";
 import BottomNav from "./BottomNav";
 import ThemeToggle from "./ThemeToggle";
@@ -13,19 +15,74 @@ interface Props {
 }
 
 /**
- * Desktop horizontal layout powered by Lenis.
- * Lenis handles smooth inertial scrolling; `gestureOrientation: 'vertical'`
- * maps vertical wheel/trackpad to horizontal scroll.
+ * Desktop horizontal layout powered by Lenis + lenis/snap.
+ * Lenis handles smooth inertial scrolling; Snap provides mandatory
+ * section-to-section snapping (like the old slider behavior).
+ * `gestureOrientation: 'vertical'` maps wheel/trackpad to horizontal.
  */
 export default function DesktopLayout({ index, onSelect }: Props) {
+  const lenisRef = useRef<{ lenis?: Lenis } | null>(null);
+  const snapRef = useRef<Snap | null>(null);
+
+  // Set up Snap once Lenis is ready.
+  const handleLenisRef = useCallback((ref: { lenis?: Lenis } | null) => {
+    lenisRef.current = ref;
+    if (!ref?.lenis) return;
+
+    // Destroy previous snap if any.
+    if (snapRef.current) {
+      snapRef.current.destroy();
+      snapRef.current = null;
+    }
+
+    const snap = new Snap(ref.lenis, {
+      type: "mandatory",
+      duration: 1.0,
+    });
+
+    // Register snap points at each section boundary.
+    for (let i = 0; i < SECTIONS.length; i++) {
+      snap.add(i * window.innerWidth);
+    }
+
+    snapRef.current = snap;
+  }, []);
+
+  // Clean up snap on unmount.
+  useEffect(() => {
+    return () => {
+      snapRef.current?.destroy();
+    };
+  }, []);
+
+  // Re-register snap points on resize.
+  useEffect(() => {
+    const onResize = () => {
+      const lenis = lenisRef.current?.lenis;
+      if (!lenis || !snapRef.current) return;
+      snapRef.current.destroy();
+
+      const snap = new Snap(lenis, {
+        type: "mandatory",
+        duration: 1.0,
+      });
+      for (let i = 0; i < SECTIONS.length; i++) {
+        snap.add(i * window.innerWidth);
+      }
+      snapRef.current = snap;
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   return (
     <ReactLenis
+      ref={handleLenisRef}
       className={styles.layout}
       options={{
         orientation: "horizontal",
         gestureOrientation: "vertical",
         lerp: 0.1,
-        duration: 1.2,
       }}
     >
       <ScrollOrientationContext.Provider value="horizontal">
@@ -48,15 +105,14 @@ function DesktopLayoutInner({
   const indexRef = useRef(index);
   indexRef.current = index;
 
-  // Programmatic scroll to section.
+  // Programmatic scroll to section (from BottomNav / keyboard).
   useEffect(() => {
-    const target = sectionRefs.current[index];
-    if (!target || !lenis) return;
-    const left = target.offsetLeft;
-    if (Math.abs(lenis.scroll - left) < 4) return;
+    if (!lenis) return;
+    const target = index * window.innerWidth;
+    if (Math.abs(lenis.scroll - target) < 4) return;
 
     isProgrammaticRef.current = true;
-    lenis.scrollTo(left, {
+    lenis.scrollTo(target, {
       duration: 1.0,
       onComplete: () => {
         isProgrammaticRef.current = false;
