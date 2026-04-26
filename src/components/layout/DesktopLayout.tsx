@@ -1,179 +1,136 @@
-import { useEffect, useRef, useState } from "react";
-import { animate, motion, useMotionValue, type PanInfo } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { SECTIONS } from "../../data/sections";
+import { useLenis } from "../../context/LenisContext";
 import BottomNav from "./BottomNav";
 import ThemeToggle from "./ThemeToggle";
-import { SectionIndexContext, SliderMotionContext } from "./SliderMotionContext";
+import ScrollProgressBar from "./ScrollProgressBar";
+import { SectionIndexContext } from "./SliderMotionContext";
 import styles from "./DesktopLayout.module.css";
-
-const DRAG_THRESHOLD = 0.2; // 20% of viewport width
-const WHEEL_THRESHOLD = 25;
-const TRANSITION_LOCK_MS = 650;
-const SECTION_DURATION = 0.6;
-const SECTION_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 interface Props {
   index: number;
   onSelect: (next: number) => void;
-  onDragChange?: (dragging: boolean) => void;
 }
 
 /**
- * Desktop horizontal slider. Uses Framer Motion for drag + animate;
- * adds wheel/keyboard handlers to mirror the legacy navigator.
+ * Desktop layout: Lenis-powered vertical smooth scroll.
+ * Sections are full-viewport panels stacked in the document flow.
+ * Bottom nav and keyboard shortcuts call lenis.scrollTo() for navigation.
  */
-export default function DesktopLayout({ index, onSelect, onDragChange }: Props) {
-  const x = useMotionValue(0);
-  const lockedRef = useRef(false);
+export default function DesktopLayout({ index, onSelect }: Props) {
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { lenisRef } = useLenis();
   const indexRef = useRef(index);
   indexRef.current = index;
-  const [sectionWidth, setSectionWidth] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth : 0,
-  );
 
-  const total = SECTIONS.length;
+  // fromObserverRef: true when the current index change was caused by the
+  // IntersectionObserver (user scrolled). Prevents the scroll effect from
+  // re-scrolling to the section the user just naturally scrolled to.
+  const fromObserverRef = useRef(false);
 
-  // Snap to current index whenever it changes or window resizes.
+  // isProgrammaticRef: true while a lenis.scrollTo animation is in flight.
+  // Blocks IntersectionObserver from firing during programmatic scrolls.
+  const isProgrammaticRef = useRef(false);
+
+  // Programmatic scroll when index changes via nav click or keyboard.
   useEffect(() => {
-    const target = -index * window.innerWidth;
-    const controls = animate(x, target, {
-      duration: SECTION_DURATION,
-      ease: SECTION_EASE,
-    });
-    return () => controls.stop();
-  }, [index, x]);
-
-  useEffect(() => {
-    const onResize = () => {
-      setSectionWidth(window.innerWidth);
-      const target = -indexRef.current * window.innerWidth;
-      x.set(target);
-    };
-    window.addEventListener("resize", onResize);
-    window.addEventListener("orientationchange", onResize);
-    return () => {
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("orientationchange", onResize);
-    };
-  }, [x]);
-
-  const startLock = () => {
-    lockedRef.current = true;
-    window.setTimeout(() => {
-      lockedRef.current = false;
-    }, TRANSITION_LOCK_MS);
-  };
-
-  const goNext = () => {
-    if (indexRef.current < total - 1) {
-      startLock();
-      onSelect(indexRef.current + 1);
+    if (fromObserverRef.current) {
+      fromObserverRef.current = false;
+      return;
     }
-  };
+    const target = sectionRefs.current[index];
+    if (!target || !lenisRef.current) return;
+    isProgrammaticRef.current = true;
+    lenisRef.current.scrollTo(target.offsetTop, { duration: 0.8 });
+    const t = window.setTimeout(() => {
+      isProgrammaticRef.current = false;
+    }, 1000);
+    return () => window.clearTimeout(t);
+  }, [index, lenisRef]);
 
-  const goPrev = () => {
-    if (indexRef.current > 0) {
-      startLock();
-      onSelect(indexRef.current - 1);
-    }
-  };
-
-  // Wheel: needs passive:false to preventDefault, so attach manually.
+  // Initial deep-link scroll: waits for Lenis to initialize (parent useEffect
+  // runs after children in React, so lenisRef.current may be null on first run).
   useEffect(() => {
-    const node = document.getElementById("desktop-track-viewport");
-    if (!node) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      if (lockedRef.current) return;
-      const delta = e.deltaX || e.deltaY;
-      if (Math.abs(delta) > WHEEL_THRESHOLD) {
-        delta > 0 ? goNext() : goPrev();
+    if (index === 0) return;
+    const tryScroll = () => {
+      if (!lenisRef.current) {
+        requestAnimationFrame(tryScroll);
+        return;
+      }
+      const target = sectionRefs.current[index];
+      if (target) {
+        lenisRef.current.scrollTo(target.offsetTop, { immediate: true });
       }
     };
-    node.addEventListener("wheel", onWheel, { passive: false });
-    return () => node.removeEventListener("wheel", onWheel);
+    requestAnimationFrame(tryScroll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keyboard navigation
+  // IntersectionObserver: tracks which section the user has scrolled to.
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isProgrammaticRef.current) return;
+        let best: IntersectionObserverEntry | null = null;
+        for (const e of entries) {
+          if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+        }
+        if (best && best.intersectionRatio >= 0.55) {
+          const i = sectionRefs.current.indexOf(best.target as HTMLDivElement);
+          if (i !== -1 && i !== indexRef.current) {
+            fromObserverRef.current = true;
+            onSelect(i);
+          }
+        }
+      },
+      { threshold: [0.55, 0.75, 1] },
+    );
+    sectionRefs.current.forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, [onSelect]);
+
+  // Keyboard navigation: arrow keys and number keys (1-5).
+  useEffect(() => {
+    const total = SECTIONS.length;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      const i = indexRef.current;
+      if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
         e.preventDefault();
-        if (!lockedRef.current) goPrev();
-        return;
-      }
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        if (i > 0) onSelect(i - 1);
+      } else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
         e.preventDefault();
-        if (!lockedRef.current) goNext();
-        return;
-      }
-      const num = Number(e.key);
-      if (Number.isInteger(num) && num >= 1 && num <= total) {
-        e.preventDefault();
-        startLock();
-        onSelect(num - 1);
+        if (i < total - 1) onSelect(i + 1);
+      } else {
+        const num = Number(e.key);
+        if (Number.isInteger(num) && num >= 1 && num <= total) {
+          e.preventDefault();
+          onSelect(num - 1);
+        }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [total]);
-
-  const handleDragStart = () => {
-    onDragChange?.(true);
-  };
-
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    onDragChange?.(false);
-    const threshold = window.innerWidth * DRAG_THRESHOLD;
-    const dx = info.offset.x;
-    let next = indexRef.current;
-    if (dx < -threshold && indexRef.current < total - 1) next = indexRef.current + 1;
-    else if (dx > threshold && indexRef.current > 0) next = indexRef.current - 1;
-
-    if (next !== indexRef.current) {
-      startLock();
-      onSelect(next);
-    } else {
-      // Snap back
-      animate(x, -indexRef.current * window.innerWidth, {
-        duration: SECTION_DURATION,
-        ease: SECTION_EASE,
-      });
-    }
-  };
+  }, []);
 
   return (
     <div className={styles.layout}>
-      <div id="desktop-track-viewport" className={styles.viewport}>
-        <SliderMotionContext.Provider value={{ x, sectionWidth }}>
-          <motion.div
-            className={styles.track}
-            style={{ x }}
-            drag="x"
-            dragElastic={0.3}
-            dragConstraints={{
-              left: -(total - 1) * sectionWidth,
-              right: 0,
-            }}
-            dragMomentum={false}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            {SECTIONS.map((s, i) => {
-              const Section = s.Component;
-              return (
-                <SectionIndexContext.Provider key={s.id} value={i}>
-                  <Section />
-                </SectionIndexContext.Provider>
-              );
-            })}
-          </motion.div>
-        </SliderMotionContext.Provider>
-      </div>
+      {SECTIONS.map((s, i) => {
+        const Section = s.Component;
+        return (
+          <SectionIndexContext.Provider key={s.id} value={i}>
+            <div
+              ref={(el) => (sectionRefs.current[i] = el)}
+              data-section-index={i}
+            >
+              <Section />
+            </div>
+          </SectionIndexContext.Provider>
+        );
+      })}
       <BottomNav activeIndex={index} onSelect={onSelect} />
       <ThemeToggle />
+      <ScrollProgressBar />
     </div>
   );
 }

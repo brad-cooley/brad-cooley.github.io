@@ -1,19 +1,23 @@
 .section {
+  /* Desktop: each section fills the viewport (minus the 56px bottom nav).
+     Using min-height so taller content never clips. */
   width: 100vw;
-  height: 100%;
+  min-height: calc(100vh - 56px);
+  min-height: calc(100dvh - 56px);
   display: flex;
   align-items: center;
   justify-content: flex-start;
   flex-shrink: 0;
   position: relative;
   padding: var(--sp-10) clamp(var(--sp-10), 8vw, var(--sp-24));
+  /* Extra bottom padding so content clears the fixed bottom nav */
+  padding-bottom: calc(var(--sp-10) + 56px);
 }
 
-/* Ghost numeral flows freely between sections during slide transitions —
-   only the viewport (DesktopLayout) clips it. */
+/* Ghost numeral flows freely — Lenis vertical parallax animates its Y. */
 .ghostNum {
   position: absolute;
-  bottom: var(--sp-6);
+  bottom: calc(var(--sp-6) + 56px);
   right: clamp(var(--sp-10), 6vw, var(--sp-20));
   font-family: var(--font-display);
   font-size: clamp(7rem, 14vw, 16rem);
@@ -30,6 +34,7 @@
   .section {
     height: 100vh;
     height: 100dvh;
+    min-height: unset;
     align-items: flex-start;
     justify-content: flex-start;
     padding: calc(var(--safe-top) + 18vh) calc(var(--safe-right) + var(--sp-6))
@@ -37,7 +42,6 @@
     scroll-snap-align: start;
     scroll-snap-stop: normal;
   }
-  /* Ghost numeral kept on mobile — smaller and tucked bottom-right */
   .ghostNum {
     font-size: clamp(8rem, 38vw, 16rem);
     bottom: calc(var(--safe-bottom) + var(--sp-4));

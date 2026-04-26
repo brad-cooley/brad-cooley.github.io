@@ -1,0 +1,19 @@
+.track {
+  position: fixed;
+  top: var(--sp-6);
+  right: var(--sp-6);
+  width: 1px;
+  height: 80px;
+  background: var(--line);
+  z-index: 900;
+  overflow: hidden;
+  border-radius: 1px;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  background: var(--cosmic-orange);
+  transform-origin: top center;
+  will-change: transform;
+}

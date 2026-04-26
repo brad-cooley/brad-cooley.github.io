@@ -17,15 +17,26 @@ body {
   background: var(--bg);
   color: var(--ink);
   line-height: 1.6;
-  height: 100%;
-  overflow: hidden;
+  /* overflow: hidden removed — desktop uses Lenis vertical scroll.
+     Lenis CSS (.lenis class on <html>) manages overflow when active. */
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
+/* Desktop: body grows to fit all stacked sections so Lenis can scroll */
+@media (min-width: 768px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+  }
+}
+
 #root {
-  height: 100%;
+  /* height: 100% removed for desktop — see rule above */
 }
 
 /* Mobile portrait: let the document itself scroll so iOS Safari can

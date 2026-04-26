@@ -1,21 +1,23 @@
 import { motion, motionValue, useTransform } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
-import { useSliderMotion } from "./SliderMotionContext";
+import { useContext } from "react";
+import { SectionIndexContext } from "./SliderMotionContext";
+import { useLenisOptional } from "../../context/LenisContext";
 
-// useTransform requires a MotionValue. Provide a stable dummy when
-// outside the slider so the hook signature stays consistent.
+// Stable dummy MotionValue for when Lenis is not available (mobile).
 const DUMMY_MV = motionValue(0);
 
 interface Props {
   /**
-   * Parallax rate. `0` = locked to section (no effect). `1` = moves at
-   * the same rate as the slider (i.e. fixed relative to viewport).
-   * Negative values move opposite the slide direction (good for
-   * "ghost" elements that drift the other way).
+   * Vertical parallax rate. Positive values make elements drift slower than
+   * the page (appear deeper/behind). Negative values make elements appear
+   * closer. Range 0–0.3 gives subtle depth; rates match the original
+   * horizontal-slider convention so call-sites need no changes.
+   *
+   * Example: rate=0.2 on a ghost numeral → numeral moves at 20% of the
+   * distance scrolled past the section top → drifts 40px per 200px scrolled.
    */
   rate: number;
-  /** Optional vertical parallax rate (rare; defaults to 0). */
-  rateY?: number;
   className?: string;
   style?: CSSProperties;
   children: ReactNode;
@@ -24,40 +26,37 @@ interface Props {
 }
 
 /**
- * Translates its children at a custom rate as the desktop slider
- * scrolls horizontally past this section. No-op outside the desktop
- * slider context (renders a plain div).
+ * Translates its children at a custom rate as the user scrolls vertically
+ * through the parent section. No-op outside the Lenis context (mobile).
  */
 export default function Parallax({
   rate,
-  rateY = 0,
   className,
   style,
   children,
   as = "div",
   "aria-hidden": ariaHidden,
 }: Props) {
-  const motionCtx = useSliderMotion();
+  const lenis = useLenisOptional();
+  const sectionIndex = useContext(SectionIndexContext);
 
-  // Hooks must run unconditionally — compute even when ctx is null,
-  // then ignore the result if not inside the slider.
-  // We always pass a MotionValue; useTransform handles the math.
-  const x = useTransform(motionCtx?.x ?? DUMMY_MV, (latest) => {
-    if (!motionCtx) return 0;
-    // Distance (in px) between this section's "natural" track offset
-    // and the live offset. When current section, this is 0.
-    const sectionOffset = -motionCtx.sectionIndex * motionCtx.sectionWidth;
-    const delta = latest - sectionOffset;
-    return delta * rate;
+  // Vertical offset = (scrollY - sectionTop) * rate * SCALE
+  // • sectionTop = sectionIndex * viewport height (sections are all 100vh)
+  // • When fully in view (delta = 0): translateY = 0
+  // • Positive rate → element drifts down slightly as you scroll past it
+  //   (moves slower than page → depth-behind illusion)
+  //
+  // SCALE 0.3: the original rates were designed for horizontal slider widths
+  // (~1920px). For vertical scroll over ~900px viewport, 0.3× gives equivalent
+  // visual depth without over-translating content.
+  const SCALE = 0.3;
+  const y = useTransform(lenis?.scrollY ?? DUMMY_MV, (scroll) => {
+    if (!lenis) return 0;
+    const sectionTop = sectionIndex * window.innerHeight;
+    return (scroll - sectionTop) * rate * SCALE;
   });
 
-  const y = useTransform(motionCtx?.x ?? DUMMY_MV, (latest) => {
-    if (!motionCtx || rateY === 0) return 0;
-    const sectionOffset = -motionCtx.sectionIndex * motionCtx.sectionWidth;
-    return (latest - sectionOffset) * rateY;
-  });
-
-  if (!motionCtx) {
+  if (!lenis) {
     const Tag = as;
     return (
       <Tag className={className} style={style} aria-hidden={ariaHidden}>
@@ -68,7 +67,7 @@ export default function Parallax({
 
   const Comp = as === "span" ? motion.span : motion.div;
   return (
-    <Comp className={className} style={{ ...style, x, y }} aria-hidden={ariaHidden}>
+    <Comp className={className} style={{ ...style, y }} aria-hidden={ariaHidden}>
       {children}
     </Comp>
   );

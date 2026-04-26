@@ -9,6 +9,7 @@ import "@fontsource-variable/dm-sans";
 import "@fontsource-variable/dm-sans/wght-italic.css";
 import "@fontsource-variable/jetbrains-mono";
 
+import "lenis/dist/lenis.css";
 import "./styles/tokens.css";
 import "./styles/global.css";
 
