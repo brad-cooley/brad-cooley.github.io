@@ -17,17 +17,34 @@ body {
   background: var(--bg);
   color: var(--ink);
   line-height: 1.6;
+  height: 100%;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overscroll-behavior-y: contain;
 }
 
-/* Mobile: Lenis root mode needs document to scroll freely. */
+#root {
+  height: 100%;
+}
+
+/* Mobile portrait: let the document itself scroll so iOS Safari can
+   auto-collapse the URL bar / toolbar. Snap is on the root element. */
 @media (max-width: 767px) and (orientation: portrait) {
-  body {
+  html {
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
     overflow: visible;
+  }
+  body {
+    overscroll-behavior-y: contain;
   }
 }
 

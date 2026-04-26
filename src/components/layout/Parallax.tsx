@@ -1,13 +1,21 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, type CSSProperties, type ReactNode } from "react";
-import { useScrollOrientation } from "./ScrollOrientationContext";
+import { motion, motionValue, useTransform } from "framer-motion";
+import type { CSSProperties, ReactNode } from "react";
+import { useSliderMotion } from "./SliderMotionContext";
+
+// useTransform requires a MotionValue. Provide a stable dummy when
+// outside the slider so the hook signature stays consistent.
+const DUMMY_MV = motionValue(0);
 
 interface Props {
   /**
-   * Parallax rate. Positive values move the element slower than scroll
-   * (classic parallax). 0 = no effect.
+   * Parallax rate. `0` = locked to section (no effect). `1` = moves at
+   * the same rate as the slider (i.e. fixed relative to viewport).
+   * Negative values move opposite the slide direction (good for
+   * "ghost" elements that drift the other way).
    */
   rate: number;
+  /** Optional vertical parallax rate (rare; defaults to 0). */
+  rateY?: number;
   className?: string;
   style?: CSSProperties;
   children: ReactNode;
@@ -16,50 +24,51 @@ interface Props {
 }
 
 /**
- * Scroll-linked parallax using Framer Motion's `useScroll`.
- * Reads orientation from context: horizontal on desktop, vertical on mobile.
- * Applies translateX (horizontal) or translateY (vertical) offset.
+ * Translates its children at a custom rate as the desktop slider
+ * scrolls horizontally past this section. No-op outside the desktop
+ * slider context (renders a plain div).
  */
 export default function Parallax({
   rate,
+  rateY = 0,
   className,
   style,
   children,
   as = "div",
   "aria-hidden": ariaHidden,
 }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-  const orientation = useScrollOrientation();
-  const isHorizontal = orientation === "horizontal";
+  const motionCtx = useSliderMotion();
 
-  const { scrollXProgress, scrollYProgress } = useScroll({
-    target: ref,
-    axis: isHorizontal ? "x" : "y",
-    offset: ["start end", "end start"],
+  // Hooks must run unconditionally — compute even when ctx is null,
+  // then ignore the result if not inside the slider.
+  // We always pass a MotionValue; useTransform handles the math.
+  const x = useTransform(motionCtx?.x ?? DUMMY_MV, (latest) => {
+    if (!motionCtx) return 0;
+    // Distance (in px) between this section's "natural" track offset
+    // and the live offset. When current section, this is 0.
+    const sectionOffset = -motionCtx.sectionIndex * motionCtx.sectionWidth;
+    const delta = latest - sectionOffset;
+    return delta * rate;
   });
 
-  const progress = isHorizontal ? scrollXProgress : scrollYProgress;
+  const y = useTransform(motionCtx?.x ?? DUMMY_MV, (latest) => {
+    if (!motionCtx || rateY === 0) return 0;
+    const sectionOffset = -motionCtx.sectionIndex * motionCtx.sectionWidth;
+    return (latest - sectionOffset) * rateY;
+  });
 
-  // Map scroll progress [0, 1] to a pixel offset.
-  // At progress=0.5 (element centered), offset=0.
-  const range = rate * 200;
-  const offset = useTransform(progress, [0, 1], [-range, range]);
-
-  const Comp = as === "span" ? motion.span : motion.div;
-
-  const motionStyle: CSSProperties & Record<string, unknown> = {
-    ...style,
-    willChange: "transform",
-  };
-
-  if (isHorizontal) {
-    (motionStyle as Record<string, unknown>).x = offset;
-  } else {
-    (motionStyle as Record<string, unknown>).y = offset;
+  if (!motionCtx) {
+    const Tag = as;
+    return (
+      <Tag className={className} style={style} aria-hidden={ariaHidden}>
+        {children}
+      </Tag>
+    );
   }
 
+  const Comp = as === "span" ? motion.span : motion.div;
   return (
-    <Comp ref={ref} className={className} style={motionStyle} aria-hidden={ariaHidden}>
+    <Comp className={className} style={{ ...style, x, y }} aria-hidden={ariaHidden}>
       {children}
     </Comp>
   );
