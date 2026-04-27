@@ -1,6 +1,59 @@
 .layout {
-  /* Sections are in document flow — no overflow clipping needed here.
-     Lenis manages scroll on window. */
   display: block;
   width: 100%;
+}
+
+/* ── Home section wrapper ─────────────────────────────────────────────── */
+/* Exactly one viewport tall so the gallery math is clean:
+   section k  ←→  scrollY = k × window.innerHeight                       */
+.homeWrap {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── Gallery wrapper ──────────────────────────────────────────────────── */
+/* Height is set inline: NUM_GALLERY × 100dvh.
+   The sticky child pins for the first (NUM_GALLERY - 1) × 100dvh of that,
+   giving each panel exactly one viewport of scroll time.                  */
+.galleryWrap {
+  position: relative;
+}
+
+/* ── Sticky viewport ──────────────────────────────────────────────────── */
+.gallerySticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── Horizontal flex track ────────────────────────────────────────────── */
+/* Width = NUM_GALLERY panels × 100vw. Framer Motion drives translateX
+   via the `x` motion value (percentage of this track width).             */
+.galleryTrack {
+  display: flex;
+  width: calc(var(--gallery-panels, 4) * 100vw);
+  height: 100%;
+  will-change: transform;
+}
+
+/* ── Individual gallery panel ─────────────────────────────────────────── */
+.galleryPanel {
+  flex-shrink: 0;
+  width: 100vw;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Thin right-edge separator between panels */
+.galleryPanel + .galleryPanel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background: var(--line);
+  pointer-events: none;
 }

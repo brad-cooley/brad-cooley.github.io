@@ -1,11 +1,17 @@
 import { useEffect, useRef } from "react";
+import { motion, useTransform, useMotionValueEvent } from "framer-motion";
 import { SECTIONS } from "../../data/sections";
 import { useLenis } from "../../context/LenisContext";
 import BottomNav from "./BottomNav";
 import ThemeToggle from "./ThemeToggle";
 import ScrollProgressBar from "./ScrollProgressBar";
+import GalleryProgress from "./GalleryProgress";
 import { SectionIndexContext } from "./SliderMotionContext";
 import styles from "./DesktopLayout.module.css";
+
+// Section 0 (Home) scrolls vertically.
+// Sections 1-N live in a sticky horizontal gallery.
+const NUM_GALLERY = SECTIONS.length - 1; // 4 panels
 
 interface Props {
   index: number;
@@ -13,43 +19,78 @@ interface Props {
 }
 
 /**
- * Desktop layout: Lenis-powered vertical smooth scroll.
- * Sections are full-viewport panels stacked in the document flow.
- * Bottom nav and keyboard shortcuts call lenis.scrollTo() for navigation.
+ * Desktop layout: vertical Home section followed by a sticky horizontal gallery.
+ *
+ * The gallery wrapper is NUM_GALLERY × 100dvh tall, providing the scroll
+ * real estate. The inner sticky viewport stays pinned while the horizontal
+ * flex track translates left — driven directly from the Lenis scrollY
+ * MotionValue so the easing is perfectly smooth.
+ *
+ * Navigation formula:  section k  ←→  scrollY = k × window.innerHeight
  */
 export default function DesktopLayout({ index, onSelect }: Props) {
-  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const { lenisRef } = useLenis();
+  const { lenisRef, scrollY: lenisScrollY } = useLenis();
   const indexRef = useRef(index);
   indexRef.current = index;
 
-  // fromObserverRef: true when the current index change was caused by the
-  // IntersectionObserver (user scrolled). Prevents the scroll effect from
-  // re-scrolling to the section the user just naturally scrolled to.
-  const fromObserverRef = useRef(false);
+  // True while a programmatic lenis.scrollTo() is animating — suppresses the
+  // scroll listener so it doesn't fight back against the animation.
+  const fromScrollRef = useRef(false);
 
-  // isProgrammaticRef: true while a lenis.scrollTo animation is in flight.
-  // Blocks IntersectionObserver from firing during programmatic scrolls.
-  const isProgrammaticRef = useRef(false);
+  // True when the last index change came from the scroll listener (user
+  // scrolled naturally). Prevents the programmatic-scroll effect from
+  // re-scrolling to a position the user just freely scrolled into.
+  const fromScrollEventRef = useRef(false);
 
-  // Programmatic scroll when index changes via nav click or keyboard.
+  // ── Horizontal translation ─────────────────────────────────────────────
+  // Gallery starts at scrollY = 1 × vh (after the 100dvh home wrapper).
+  // Scroll range to traverse all gallery panels: (NUM_GALLERY - 1) × vh.
+  //
+  // Track is NUM_GALLERY panels wide (each 100vw).
+  // At progress=0 → x=0% (About panel). At progress=1 → x=-75% (Resume).
+  // xPct = -(NUM_GALLERY-1)/NUM_GALLERY × 100  (percent of track width)
+  const xPct = -((NUM_GALLERY - 1) / NUM_GALLERY) * 100;
+
+  const x = useTransform(lenisScrollY, (scroll) => {
+    const vh = window.innerHeight;
+    const progress = Math.max(0, Math.min(1, (scroll - vh) / ((NUM_GALLERY - 1) * vh)));
+    return `${progress * xPct}%`;
+  });
+
+  // Gallery progress 0→1 for the dot indicator
+  const galleryProgress = useTransform(lenisScrollY, (scroll) => {
+    const vh = window.innerHeight;
+    return Math.max(0, Math.min(1, (scroll - vh) / ((NUM_GALLERY - 1) * vh)));
+  });
+
+  // ── Active section tracking ────────────────────────────────────────────
+  // section k is active when scrollY is nearest to k × vh.
+  useMotionValueEvent(lenisScrollY, "change", (scroll) => {
+    if (fromScrollRef.current) return;
+    const vh = window.innerHeight;
+    const next = Math.min(SECTIONS.length - 1, Math.max(0, Math.round(scroll / vh)));
+    if (next !== indexRef.current) {
+      fromScrollEventRef.current = true;
+      onSelect(next);
+    }
+  });
+
+  // ── Programmatic scroll (nav click / keyboard) ─────────────────────────
   useEffect(() => {
-    if (fromObserverRef.current) {
-      fromObserverRef.current = false;
+    if (fromScrollEventRef.current) {
+      fromScrollEventRef.current = false;
       return;
     }
-    const target = sectionRefs.current[index];
-    if (!target || !lenisRef.current) return;
-    isProgrammaticRef.current = true;
-    lenisRef.current.scrollTo(target.offsetTop, { duration: 0.8 });
+    if (!lenisRef.current) return;
+    fromScrollRef.current = true;
+    lenisRef.current.scrollTo(index * window.innerHeight, { duration: 0.9 });
     const t = window.setTimeout(() => {
-      isProgrammaticRef.current = false;
-    }, 1000);
+      fromScrollRef.current = false;
+    }, 1100);
     return () => window.clearTimeout(t);
   }, [index, lenisRef]);
 
-  // Initial deep-link scroll: waits for Lenis to initialize (parent useEffect
-  // runs after children in React, so lenisRef.current may be null on first run).
+  // ── Initial deep-link: wait for Lenis to init, then jump ──────────────
   useEffect(() => {
     if (index === 0) return;
     const tryScroll = () => {
@@ -57,39 +98,13 @@ export default function DesktopLayout({ index, onSelect }: Props) {
         requestAnimationFrame(tryScroll);
         return;
       }
-      const target = sectionRefs.current[index];
-      if (target) {
-        lenisRef.current.scrollTo(target.offsetTop, { immediate: true });
-      }
+      lenisRef.current.scrollTo(index * window.innerHeight, { immediate: true });
     };
     requestAnimationFrame(tryScroll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // IntersectionObserver: tracks which section the user has scrolled to.
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (isProgrammaticRef.current) return;
-        let best: IntersectionObserverEntry | null = null;
-        for (const e of entries) {
-          if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
-        }
-        if (best && best.intersectionRatio >= 0.55) {
-          const i = sectionRefs.current.indexOf(best.target as HTMLDivElement);
-          if (i !== -1 && i !== indexRef.current) {
-            fromObserverRef.current = true;
-            onSelect(i);
-          }
-        }
-      },
-      { threshold: [0.55, 0.75, 1] },
-    );
-    sectionRefs.current.forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
-  }, [onSelect]);
-
-  // Keyboard navigation: arrow keys and number keys (1-5).
+  // ── Keyboard navigation ────────────────────────────────────────────────
   useEffect(() => {
     const total = SECTIONS.length;
     const onKey = (e: KeyboardEvent) => {
@@ -113,21 +128,47 @@ export default function DesktopLayout({ index, onSelect }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const HomeSection = SECTIONS[0].Component;
+
   return (
     <div className={styles.layout}>
-      {SECTIONS.map((s, i) => {
-        const Section = s.Component;
-        return (
-          <SectionIndexContext.Provider key={s.id} value={i}>
-            <div
-              ref={(el) => (sectionRefs.current[i] = el)}
-              data-section-index={i}
-            >
-              <Section />
-            </div>
-          </SectionIndexContext.Provider>
-        );
-      })}
+      {/* ── Section 0: Home — full-height vertical panel ── */}
+      <SectionIndexContext.Provider value={0}>
+        <div className={styles.homeWrap}>
+          <HomeSection />
+        </div>
+      </SectionIndexContext.Provider>
+
+      {/* ── Sections 1-N: Sticky horizontal gallery ── */}
+      {/*
+        Height = NUM_GALLERY × 100dvh creates the scroll real estate.
+        The sticky inner stays pinned for exactly (NUM_GALLERY - 1) × 100dvh
+        of scroll, giving each panel one full viewport of scroll time.
+      */}
+      <div className={styles.galleryWrap} style={{ height: `${NUM_GALLERY * 100}dvh` }}>
+        <div className={styles.gallerySticky}>
+          <motion.div className={styles.galleryTrack} style={{ x }}>
+            {SECTIONS.slice(1).map((s, i) => {
+              const Section = s.Component;
+              return (
+                <SectionIndexContext.Provider key={s.id} value={i + 1}>
+                  <div className={styles.galleryPanel}>
+                    <Section />
+                  </div>
+                </SectionIndexContext.Provider>
+              );
+            })}
+          </motion.div>
+
+          {/* Dot-style panel indicator inside the sticky viewport */}
+          <GalleryProgress
+            numPanels={NUM_GALLERY}
+            progress={galleryProgress}
+            activePanel={Math.max(0, index - 1)}
+          />
+        </div>
+      </div>
+
       <BottomNav activeIndex={index} onSelect={onSelect} />
       <ThemeToggle />
       <ScrollProgressBar />

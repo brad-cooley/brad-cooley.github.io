@@ -1,0 +1,65 @@
+.wrap {
+  position: absolute;
+  bottom: calc(var(--sp-5) + 56px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(40px, 6vw, 80px);
+}
+
+/* ── Connector lines ─────────────────────────────────────────────────── */
+.line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.fill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 1px;
+  background: var(--cosmic-orange);
+  transform: translateY(-50%);
+  pointer-events: none;
+  /* Framer Motion drives width via style prop */
+}
+
+/* ── Per-panel stop ──────────────────────────────────────────────────── */
+.stop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  /* Framer Motion animates backgroundColor and scale */
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  line-height: 1;
+  text-transform: uppercase;
+}

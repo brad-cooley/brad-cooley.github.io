@@ -1,8 +1,8 @@
 .section {
-  /* Desktop: each section fills the viewport (minus the 56px bottom nav).
-     Using min-height so taller content never clips. */
+  /* Desktop: sections live inside 100dvh containers (homeWrap or galleryPanel).
+     min-height fills the visible area above the 56px bottom nav.           */
   width: 100vw;
-  min-height: calc(100vh - 56px);
+  height: 100%;
   min-height: calc(100dvh - 56px);
   display: flex;
   align-items: center;
@@ -10,11 +10,12 @@
   flex-shrink: 0;
   position: relative;
   padding: var(--sp-10) clamp(var(--sp-10), 8vw, var(--sp-24));
-  /* Extra bottom padding so content clears the fixed bottom nav */
+  /* Extra bottom gap so content clears the fixed bottom nav */
   padding-bottom: calc(var(--sp-10) + 56px);
 }
 
-/* Ghost numeral flows freely — Lenis vertical parallax animates its Y. */
+/* Ghost numeral: Lenis vertical parallax animates its Y.
+   Bottom offset accounts for the bottom nav bar.                          */
 .ghostNum {
   position: absolute;
   bottom: calc(var(--sp-6) + 56px);
@@ -30,6 +31,7 @@
   letter-spacing: -0.04em;
 }
 
+/* ── Mobile portrait ─────────────────────────────────────────────────── */
 @media (max-width: 767px) and (orientation: portrait) {
   .section {
     height: 100vh;
