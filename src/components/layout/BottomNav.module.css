@@ -9,16 +9,30 @@
   border-top: 1px solid var(--line);
   display: flex;
   align-items: stretch;
+  overflow: hidden;
 }
 
+/* ── Scroll-progress fill ─────────────────────────────────────────────── */
+.fill {
+  position: absolute;
+  inset: 0;
+  background: var(--cosmic-orange);
+  transform-origin: left;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Shared container layout ──────────────────────────────────────────── */
 .container {
   display: flex;
   align-items: stretch;
   padding: 0 clamp(var(--sp-8), 5vw, var(--sp-16));
   flex: 1;
   position: relative;
+  z-index: 1;
 }
 
+/* ── Normal nav buttons ───────────────────────────────────────────────── */
 .item {
   display: flex;
   align-items: center;
@@ -42,15 +56,27 @@
   color: var(--ink-2);
 }
 
-.indicator {
+/* ── Inverted text layer (bg-colored text over fill) ─────────────────── */
+.invertedLayer {
   position: absolute;
-  top: -1px;
-  left: 0;
-  height: 2px;
-  background: var(--cosmic-orange);
+  inset: 0;
   pointer-events: none;
+  display: flex;
+  align-items: stretch;
+  z-index: 2;
 }
 
+.invertedItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-5);
+  height: 100%;
+  flex-shrink: 0;
+  color: var(--bg);
+}
+
+/* ── Type styles (shared by both layers) ─────────────────────────────── */
 .num {
   font-family: var(--font-mono);
   font-size: var(--text-xs);

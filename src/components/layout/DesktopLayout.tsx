@@ -5,7 +5,6 @@ import { useLenis } from "../../context/LenisContext";
 import BottomNav from "./BottomNav";
 import ThemeToggle from "./ThemeToggle";
 import ScrollProgressBar from "./ScrollProgressBar";
-import GalleryProgress from "./GalleryProgress";
 import { SectionIndexContext } from "./SliderMotionContext";
 import styles from "./DesktopLayout.module.css";
 
@@ -55,12 +54,6 @@ export default function DesktopLayout({ index, onSelect }: Props) {
     const vh = window.innerHeight;
     const progress = Math.max(0, Math.min(1, (scroll - vh) / ((NUM_GALLERY - 1) * vh)));
     return `${progress * xPct}%`;
-  });
-
-  // Gallery progress 0→1 for the dot indicator
-  const galleryProgress = useTransform(lenisScrollY, (scroll) => {
-    const vh = window.innerHeight;
-    return Math.max(0, Math.min(1, (scroll - vh) / ((NUM_GALLERY - 1) * vh)));
   });
 
   // ── Active section tracking ────────────────────────────────────────────
@@ -160,12 +153,6 @@ export default function DesktopLayout({ index, onSelect }: Props) {
             })}
           </motion.div>
 
-          {/* Dot-style panel indicator inside the sticky viewport */}
-          <GalleryProgress
-            numPanels={NUM_GALLERY}
-            progress={galleryProgress}
-            activePanel={Math.max(0, index - 1)}
-          />
         </div>
       </div>
 
